@@ -79,23 +79,22 @@
           duration: 0
         })
         try {
-          let res = await get('/user/logincms', {
-            user_phone: this.formItem.account,
-            user_word: this.formItem.password,
-            state: 1,
-          })
-          if (res.Landing_status == 1) {
-            this.$Message.success('登录成功')
-            localStorage.setItem('csrf-token', res)
-            this.$store.commit('setToken', res)
-            this.$router.push({ name: 'home' })
-          } else {
-            this.$Message.success('登录失败！')
-          }
+          let res = await post('/user/login',{
+            userPhone: this.formItem.account,
+            userWord: this.formItem.password,
+            state:0
+          },{
 
+          })
+          this.$Message.success("登录成功");
+          localStorage.setItem('csrf-token', res.data);
+          this.$store.commit('setToken', res.data);
+          debugger
+         // this.$router.push({name: 'home'});
         } catch (error) {
           this.$throw(error)
         }
+
         setTimeout(loadings, 0)
         this.isValidate = false
       }

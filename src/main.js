@@ -15,7 +15,7 @@ import GLOBAL from '@/api/global_variable'
 // import '@/mock'
 // 实际打包时应该不引入mock
 /* eslint-disable */
-if (process.env.NODE_ENV !== 'production')
+if (process.env.NODE_ENV !== 'development')
   //require('@/mock')
 
 Vue.use(iView)

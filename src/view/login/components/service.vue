@@ -34,10 +34,11 @@
 </template>
 <script>
   import md5 from 'js-md5'
-  import { post, get } from '@/libs/axios-cfg'
+  import {post, get} from '@/libs/axios-cfg'
+  import qs from 'qs'
 
   export default {
-    data () {
+    data() {
       return {
         isSubmit: false,
         formItem: {
@@ -49,11 +50,11 @@
         isValidate: false,
         FromRule: {
           account: [
-            { required: true, message: '账号不能为空' }
+            {required: true, message: '账号不能为空'}
           ],
           password: [
-            { required: true, message: '请填写密码', },
-            { type: 'string', min: 6, message: '密码长度不能小于6位', }
+            {required: true, message: '请填写密码',},
+            {type: 'string', min: 6, message: '密码长度不能小于6位',}
           ]
         }
       }
@@ -62,7 +63,7 @@
       md5
     },
     methods: {
-      handleSubmit () {
+      handleSubmit() {
         if (this.isValidate) {
           return false
         }
@@ -72,23 +73,26 @@
           }
         })
       },
-      async login () {
+      async login() {
         this.isValidate = true
         const loadings = this.$Message.loading({
           content: '用户信息验证中...',
           duration: 0
         })
         try {
-          let res = await get('/user/logincms', {
+          let res = await post(this.$url.login, {
             user_phone: this.formItem.account,
             user_word: this.formItem.password,
-            state: 1,
+            state: 0,
           })
-          if (res.Landing_status == 1) {
+          console.log(res)
+          if (res.status == 1) {
+            let data = qs.stringify(res.data.user);
             this.$Message.success('登录成功')
-            localStorage.setItem('csrf-token', res)
-            this.$store.commit('setToken', res)
-            this.$router.push({ name: 'home' })
+            localStorage.setItem('user', data)
+            localStorage.setItem('token', res.data.tokenString)
+            this.$store.commit('setToken', res.data.tokenString)
+            this.$router.push({name: 'home'})
           } else {
             this.$Message.success('登录失败！')
           }

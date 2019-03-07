@@ -6,13 +6,13 @@
         <Button type="success" @click="attribute('add')">添加</Button>
       </Card>
 
-      <div v-for="(item,index) in img">
+      <div v-for="(item,index) in img" v-bind:key="item">
         <Col span="4" class="c-col">
           <Card class="c-height">
             <p slot="title">
               <Icon type="md-aperture" size="20"/>&nbsp;{{item.courseExplain}}
             </p>
-            <div class="imgDiv"><img class="" v-bind:src="item.courseImg">
+            <div class="imgDiv"><img class="" v-bind:src="item.rotationImg">
               <div class="c-text-center">
                 <Button size="small" type="warning" @click="attribute('update',index)">属性</Button>
                 <Button size="small" type="info" @click="leftRemove(index)">左移</Button>
@@ -23,7 +23,7 @@
               <br>
               <h2>资讯内容</h2>
               <Divider/>
-              <div class="c-div" slot="title" v-html="item.courseContent"></div>
+              <div class="c-div" slot="title" v-html="item.rotationConnet"></div>
             </div>
           </Card>
         </Col>
@@ -32,25 +32,26 @@
     </Row>
     <Modal v-model="modal.show" title="属性"
            :mask-closable="false" :closable="false" :width="800">
-      <Form ref="modalForm" :model="modal.data" :label-width="40">
-        <FormItem label="标题" prop="courseExplain">
-          <Input v-model.trim="modal.data.courseExplain"></Input>
-        </FormItem>
-        <FormItem label="图片" prop="courseImg">
-          <imgUp></imgUp>
-        </FormItem>
-        <FormItem label="内容" prop="courseContent">
-          <Editor v-model="modal.data.courseContent" :isClear="isClear" @change="change"></Editor>
-        </FormItem>
+      <Form ref="modalForm" :model="modal.data" :label-width="70">
 
+        <FormItem label="图片地址" prop="rotationImg">
+          <Input v-model.trim="modal.data.rotationImg"></Input>
+        </FormItem>
+        <FormItem label="说明" prop="rotationConnet">
+          <Editor v-model="modal.data.rotationConnet" :isClear="isClear" @change="change"></Editor>
+        </FormItem>
+        <FormItem label="图片应用">
+          <RadioGroup v-model="modal.data.rotationState">
+            <Radio label="0">首页资讯的图片</Radio>
+            <Radio label="1">矿机页面的图片</Radio>
+          </RadioGroup>
+        </FormItem>
       </Form>
       <div slot="footer">
         <Button type="default" :disabled="modal.loading" @click="cancel(false)">取消</Button>
         <Button type="primary" :loading="modal.loading" @click="ok">确定</Button>
       </div>
     </Modal>
-
-
     <Modal v-model="removeModal.show" width="360">
       <p slot="header" style="color:#f60;text-align:center">
         <Icon type="information-circled"></Icon>
@@ -64,21 +65,20 @@
       </div>
     </Modal>
   </div>
-
 </template>
 <script>
-  import { post } from '@/libs/axios-cfg'
+  import {post, get, del} from '@/libs/axios-cfg'
   import imgUp from './components/imgUp.vue'
   import Editor from './components/editor.vue'
   import './index.less'
 
   export default {
-    data () {
+    data() {
       return {
         typeOperation: '',
         removeModal: {
           show: false,
-          loading: false,
+          loading: false
         },
         updateIndex: '',
         deleteIndex: '',
@@ -86,83 +86,71 @@
           loading: false,
           show: false,
           data: {
-            courseExplain: '',
-            courseImg: '',
-            courseContent: '',
-            contentState: '',
-          },
+            rotationId: '',
+            rotationImg: '',
+            rotationConnet: '',
+            rotationState: ''
+          }
         },
         isClear: false,
 
-        img: [
-          {
-            courseExplain: '资讯标题一',
-            courseImg: 'https://www.renbaojia.com/static/img/sy_img1.jpg',
-            courseContent: '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;无人与我立黄昏，无人问我粥可温。 无人陪我看星辰，无人醒我茶已冷。 无人于我捻熄灯，无人共我书半生。 无人陪我夜以深，无人与我把酒分。 无人问我言中泪，无人忧我独行身。 回首向来萧瑟处，无人等在灯火阑珊处。'
-              + '<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;最美的风景就是皎洁的月光映在你微笑的脸上，甜美，楚楚动人。我多想对你说一句我爱你，但是你又是那么遥不可及。'
-          }, {
-            courseExplain: '资讯标题二',
-            courseImg:
-              'https://www.renbaojia.com/static/img/sy_img2.jpg',
-            courseContent: ' &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;不要活成当初少年时自己讨厌的模样。两个人在一起久了，就象左手和右手，即使不再相爱也会选择相守，因为放弃这么多年的时光需要很大的勇气。<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;也许生命中会出现你爱的人，但那终归是过客，你还是会牵着你的左手或者右手一直走下去。——幸福有时候真的与爱情无关。'
-          }, {
-            courseExplain: '资讯标题三',
-            courseImg:
-              'https://www.renbaojia.com/static/img/sy_img3.jpg',
-            courseContent: '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;生活从不简单，它偶尔让我们岁月静好 偶尔让我们含泪前行，命运弄人<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;个中滋味，如人饮水，冷暖自知，但不论如何也不要绝望，世界那么大，对的人始终会出现。'
-          }, {
-            courseExplain: '资讯标题四',
-            courseImg:
-              'https://www.renbaojia.com/static/img/sy_img4.jpg',
-            courseContent: '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;生活从不简单，它偶尔让我们岁月静好，偶尔让我们含泪前行，命运弄人 个中滋味，如人饮水，冷暖自知，但不论如何也不要绝望<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;世界那么大，对的人始终会出现。'
-          }, {
-            courseExplain: '资讯标题五',
-            courseImg:
-              'https://www.renbaojia.com/static/img/sy_img5.jpg',
-            courseContent: '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;我没有花言巧语，只有默默的行动在实践着我的追梦<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;我也暂时不期望不理解的人而理解我。世上只有最美的结果，才是最美的解释!'
-          }]
+        img: []
 
       }
     },
+    created() {
+      this.getData()
+    },
     methods:
       {
-        swapItems (arr, index1, index2) {
+        /**
+         * @description 获取轮播
+         */
+        async getData() {
+          this.modal.loading = true
+          try {
+            let res = await get(this.$url.getRotation)
+            this.img = res.data
+          } catch (error) {
+            this.$throw(error)
+          }
+          this.modal.loading = false
+        },
+        // 移动轮播图
+        swapItems(arr, index1, index2) {
           arr[index1] = arr.splice(index2, 1, arr[index1])[0]
           return arr
         },
-        attribute (type, index) {
-          if (type == 'add') {
-            this.modal.data.courseExplain = ''
-            this.modal.data.courseImg = ''
-            this.modal.data.courseContent = ''
-
-            this.modal.show = true
+        attribute(type, index) {
+          if (type === 'add') {
+            this.modal.data.rotationId = ''
+            this.modal.data.rotationImg = ''
+            this.modal.data.rotationConnet = ''
+            this.modal.data.rotationState = ''
           } else {
             this.typeOperation = 'update'
             this.updateIndex = index
             let temp1 = this.img[index]
             let obj = JSON.parse(JSON.stringify(temp1))
             this.modal.data = obj
-            this.modal.show = true
           }
-
-        }
-        ,
-        leftRemove (index) {
+          this.modal.show = true
+        },
+        leftRemove(index) {
           if (this.img.length > 1 && index !== 0) {
             this.swapItems(this.img, index, index - 1)
             this.$Message.success('移动成功')
           }
         },
-        rightRemove (index) {
+        rightRemove(index) {
           if (this.img.length > 1 && index !== (this.img.length - 1)) {
             this.swapItems(this.img, index, index + 1)
             this.$Message.success('移动成功')
           }
         },
-        deleteImg (index) {
+        deleteImg(index) {
           this.deleteIndex = index
-          if (this.removeModal.show == false) {
+          if (this.removeModal.show === false) {
             this.removeModal.show = true
           }
         },
@@ -170,52 +158,77 @@
          * @description 关闭Modal
          * @param reload 是否重新加载数据
          */
-        cancel (reload = false) {
+        cancel(reload = false) {
           this.modal.show = false
         },
         /**
          * @description 确定按钮单击回调
          */
-        ok () {
+        async ok() {
           this.$refs.modalForm.validate(valid => {
             if (valid) {
               this.modal.loading = true
-              if (this.typeOperation == 'update') {
-                this.img[this.updateIndex].courseExplain = this.modal.data.courseExplain
-                this.img[this.updateIndex].courseImg = this.modal.data.courseImg
-                this.img[this.updateIndex].courseContent = this.modal.data.courseContent
+              let url = ''
+              if (this.typeOperation === 'update') {
+                url = this.$url.updateRotationChart
+                this.img[this.updateIndex] = this.modal.data
               } else {
-
-                this.$Message.success('照片添加成功')
-                let data = JSON.parse(JSON.stringify(this.modal.data))
-                this.img.push(data)
-
+                url = this.$url.addRotationChart
               }
-              this.modal.loading = false
-              this.modal.show = false
+              this.modal.loading = true
+              this.updateAdd(url)
             }
-
           })
+        },
+        async updateAdd(url) {
+          try {
+            let res = await post(url, this.modal.data)
+            console.log(res)
+            if (res.status === 1) {
+              this.modal.loading = false
+              this.$Message.success('操作成功')
+              let data = JSON.parse(JSON.stringify(this.modal.data))
+              this.img.push(data)
+            } else {
+              this.$Message.success('操作失败')
+            }
+          } catch (error) {
+            this.$throw(error)
+          }
+          this.modal.loading = false
+          this.modal.show = false
         },
         /**
          * @Description 确认删除事件
          */
-        confirmDelete () {
+        confirmDelete() {
+          this.delete()
+        },
+        async delete() {
           this.removeModal.loading = true
-          this.img.splice(this.deleteIndex, 1)
-          this.removeModal.show = false
-          this.removeModal.loading = false
-          this.$Message.success('删除成功！')
+          try {
+            let res = await del(this.$url.deleteRotationChart, this.img[this.deleteIndex].rotationId)
+            console.log(res)
+            if (res.status === 1) {
+              this.modal.loading = false
+              this.img.splice(this.deleteIndex, 1)
+              this.$Message.success('删除成功！')
+              this.removeModal.show = false
+              this.removeModal.loading = false
+            } else {
+              this.$Message.success('删除失败！')
+            }
+          } catch (error) {
+            this.$throw(error)
+          }
         },
-        change (val) {
+        change(val) {
           // console.log(val)
-          this.img.courseContent = val
-        },
+          this.img.rotationConnet = val
+        }
       },
-
     components: {
       imgUp, Editor
     }
   }
 </script>
-

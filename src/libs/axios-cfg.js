@@ -1,25 +1,28 @@
 import axios from 'axios'
 import iView from 'iview'
-import { ResError } from './error/ResError'
+import {ResError} from './error/ResError'
 import sf from 'string-format'
 import store from '@/store'
-import { router } from '@/router/index'
+import {router} from '@/router/index'
 import config from '../config/index'
+import qs from 'qs'
 
 const baseRequestUrl = process.env.NODE_ENV === 'development' ? config.baseUrl.dev : config.baseUrl.pro
 const axiosInstance = axios.create({
   baseURL: baseRequestUrl,
   timeout: 3000
   // withCredentials: true
+
 })
-
-
-
 axiosInstance.interceptors.request.use(function (config) {
   iView.LoadingBar.start()
-  /*if (localStorage.getItem('csrf-token')) {
-    config.headers.Authorization = localStorage.getItem('csrf-token')
-  }*/
+  config.data = qs.stringify(config.data);
+  if (config.url != '/cms/user/logincms') {
+    if (localStorage.getItem('token')) {
+      console.log('token为：' + localStorage.getItem('token'))
+      config.headers.token = localStorage.getItem('token')
+    }
+  }
   return config
 }, function (error) {
   iView.LoadingBar.finish()
@@ -53,11 +56,11 @@ export const baseUrl = baseRequestUrl
 
 export const get = (url, params, pathVariable = null) => {
   if (params == null) {
-    params = { axios_timestamp_current: new Date().getTime() }
+    params = {axios_timestamp_current: new Date().getTime()}
   } else {
     params.axios_timestamp_current = new Date().getTime()
   }
-  return axiosInstance.get(sf(url, pathVariable), { params: params })
+  return axiosInstance.get(sf(url, pathVariable), {params: params})
 }
 
 export const post = (url, params, pathVariable = null) => axiosInstance.post(sf(url, pathVariable), params)
@@ -66,4 +69,4 @@ export const put = (url, params, pathVariable = null) => axiosInstance.put(sf(ur
 
 export const patch = (url, params, pathVariable = null) => axiosInstance.patch(sf(url, pathVariable), params)
 
-export const del = (url, params, pathVariable = null) => axiosInstance.delete(sf(url, pathVariable), { params: params })
+export const del = (url, params, pathVariable = null) => axiosInstance.delete(sf(url, pathVariable), {params: params})

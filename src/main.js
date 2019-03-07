@@ -11,6 +11,7 @@ import 'iview/dist/styles/iview.css'
 import './index.less'
 import '@/assets/icons/iconfont.css'
 import './libs/iview-cfg'
+import GLOBAL from '@/api/global_variable'
 // import '@/mock'
 // 实际打包时应该不引入mock
 /* eslint-disable */
@@ -23,6 +24,7 @@ Vue.config.productionTip = false
  * @description 全局注册应用配置
  */
 Vue.prototype.$config = config
+Vue.prototype.$url=GLOBAL
 /**
  * 注册指令
  */

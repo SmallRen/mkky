@@ -9,7 +9,7 @@
         <template>
           <Row>
             <Col span="15">
-              <Button type="info" @click="openAddModal(null)">
+              <Button type="info" @click="attribute('add')">
                 <Icon type="md-add"></Icon>&nbsp;添加
               </Button>
               <Button :disabled="setting.loading" type="success" @click="getData">
@@ -30,7 +30,7 @@
           </Row>
           <Table ref="table" class="margin-bottom-10" @on-selection-change="selectionChange"
                  :columns="columns" :loading="setting.loading" :border="setting.showBorder"
-                 :data="data">
+                 :data="data.list">
 
           </Table>
           <Page :total="data.total" class="tr" @on-change="pageChange" :current.sync="data.current"
@@ -41,17 +41,25 @@
     </Card>
     <Modal v-model="modal.show" title="属性"
            :mask-closable="false" :closable="false" :width="800">
-      <Form ref="modalForm" :model="modal.data" :label-width="40">
-        <FormItem label="标题" prop="courseExplain">
-          <Input v-model.trim="modal.data.courseExplain"></Input>
+      <Form ref="modalForm" :model="modal.informaHeadline" :label-width="80">
+        <FormItem label="标题" prop="informaHeadline">
+          <Input v-model.trim="modal.data.informaHeadline"></Input>
         </FormItem>
-        <FormItem label="图片" prop="courseImg">
-          <imgUp></imgUp>
+        <FormItem label="图片地址" prop="informa_img">
+          <Input v-model.trim="modal.data.informa_img"></Input>
         </FormItem>
-        <FormItem label="内容" prop="courseContent">
-          <Editor v-model="modal.data.courseContent" :isClear="editor.isClear" @change="change"></Editor>
+        <FormItem label="内容" prop="informaContent">
+          <Editor v-model="modal.data.informaContent" :isClear="editor.isClear" @change="change"></Editor>
         </FormItem>
-
+        <FormItem label="资讯时间" prop="informaTime">
+          <Input v-model="modal.data.informaTime" :isClear="editor.isClear" @change="change"></Input>
+        </FormItem>
+        <FormItem label="内容" prop="informaId">
+          <Input v-model="modal.data.informaId" hidden :isClear="editor.isClear" @change="change"></Input>
+        </FormItem>
+        <FormItem label="资讯状态" prop="informaState">
+          <Input v-model="modal.data.informaState" :isClear="editor.isClear" @change="change"></Input>
+        </FormItem>
       </Form>
       <div slot="footer">
         <Button type="default" :disabled="modal.loading" @click="cancel(false)">取消</Button>
@@ -78,21 +86,25 @@
 </template>
 <script>
   import dayjs from 'dayjs'
-  import { post } from '@/libs/axios-cfg'
-  import Add from './components/add.vue'
+  import { post, get, put,del } from '@/libs/axios-cfg'
   import Update from './components/update.vue'
   import Editor from './components/editor.vue'
   import imgUp from './components/imgUp.vue'
+  import './index.less'
 
   export default {
     data () {
       return {
+        updateIndex: '',
+        typeOperation: '',
         updateUserModal: false,
         resetPasswordModal: false,
         updateUserId: null,
         resetPasswordUser: null,
         selections: [],
-        removeModal: false,
+        removeModal: {
+          show: false
+        },
         setting: {
           loading: true,
           showBorder: true
@@ -101,10 +113,12 @@
           loading: false,
           show: false,
           data: {
-            courseExplain: '',
-            courseImg: '',
-            courseContent: '',
-            contentState: '',
+            informaId:'',
+            informaHeadline: '',
+            informaContent: '',
+            informa_img: '',
+            informaTime: '',
+            informaState: ''
           }
         },
         editor: {
@@ -121,54 +135,31 @@
             width: 60,
             align: 'center'
           },
-          { title: '资讯id', key: 'informaId', sortable: true, align: 'center' ,width:180,},
-          { title: '资讯名称', key: 'informaHeadline', sortable: true, align: 'center',width:100, },
-          { title: '资讯图片url', key: 'informa_img', sortable: true, align: 'center' ,width:300,},
-          { title: '资讯内容', key: 'informaContent', sortable: true, align: 'center' },
-          {
-            title: '资讯状态', key: 'informaState', sortable: true, align: 'center',width:120,
-            render: (h, params) => {
-
-              return h('Tag',
-                {
-                  props: {
-                    color: params.row.informaState == 1 ? 'error' : 'success'
-                  }
-                }, params.row.informaState == 1 ? '下架' : '上架')
-
-            },
-          },
-
+          { title: '资讯id', key: 'informaId', sortable: true, align: 'center', width: 300, },
+          { title: '资讯名称', key: 'informaHeadline', sortable: true, align: 'center', width: 180, },
+          { title: '资讯图片url', key: 'informa_img', sortable: true, align: 'center', width: 300, },
+          { title: '资讯内容', key: 'informa_img', sortable: true, align: 'center',  },
           {
             title: '创建日期',
-            key: 'informaTime',width:180,
+            key: 'informaTime', width: 180,
             render: (h, params) => {
-              return h('span', dayjs(params.row.createDate).format('YYYY年MM月DD日 HH:mm:ss'))
+              return h('span', dayjs(params.row.informaTime).format('YYYY年MM月DD日 HH:mm:ss'))
             },
             sortable: true
           },
           {
             title: '操作',
             key: 'action',
-            width: 260,
+            width: 160,
             align: 'center',
             render: (h, params) => {
               return h('div', [
-                h('Button', {
-                  props: { type: params.row.status == 1 ? 'warning' : 'success', size: 'small' },
-                  style: { marginRight: '5px' },
-                  on: {
-                    click: () => {
-
-                    }
-                  }
-                }, '上架'),
                 h('Button', {
                   props: { type: 'primary', size: 'small' },
                   style: { marginRight: '5px' },
                   on: {
                     click: () => {
-                      this.openAddModal(params.row.id)
+                      this.attribute('update', params.index)
                     }
                   }
                 }, '修改'),
@@ -181,7 +172,7 @@
                         obj: params.row,
                         index: params.index
                       }
-                      this.removeModal = true
+                      this.removeModal.show = true
                     }
                   }
                 }, '删除')
@@ -189,26 +180,17 @@
             }
           }
         ],
-        data: [
-          {
-            informaId: 'ADF722D7S1SD5F2S8',
-            informaHeadline: '资讯标题',
-            informaTime: '2019-03-01 12:42:56',
-            informaState: '1',
-            informaContent: '这是资讯的标题',
-            informa_img: 'https://www.renbaojia.com/static/img/sy_img1.jpg',
-          }
-        ],
+        data: [],
         dataFilter: {
           page: 1,
-          pageSize: 10
+          limit: 10
         },
         removeObject: null,
         roles: null
       }
     },
     components: {
-      Add, Update, Editor, imgUp
+      Update, Editor, imgUp
     },
     created () {
       this.getData()
@@ -294,39 +276,38 @@
       async getData () {
         this.setting.loading = true
         try {
-          /*let res = await post('/system/user/list', {
-           page: this.dataFilter.page,
-           pageSize: this.dataFilter.pageSize
-         })*/
-          //this.data = res.data
+          let res = await get(this.$url.informationList, {
+            page: this.dataFilter.page,
+            limit: this.dataFilter.limit
+          })
+          this.data = res.data
         } catch (error) {
           this.$throw(error)
         }
         this.setting.loading = false
       },
-      /**
-       * @description 获取角色列表
-       */
-      async getRoleList () {
-        try {
-          let res = await post('/system/role/list', {
-            page: 1,
-            pageSize: 1000
-          })
-          this.roles = res.data.records
-        } catch (error) {
-          this.$throw(error)
-        }
-      },
+
       /**
        * @description 打开模态窗口
        * @param uid 用户ID
        * @param type 打开类型
        */
-      openAddModal (uid, type = 'update') {
-
+      attribute (type, index) {
+        if (type === 'add') {
+          this.typeOperation = 'add'
+          this.modal.data.informaHeadline = ''
+          this.modal.data.informaContent = ''
+          this.modal.data.informa_img = ''
+          this.modal.data.informaTime = ''
+          this.modal.data.informaId = ''
+          this.modal.data.informaState = ''
+        } else {
+          this.typeOperation = 'update'
+          let temp1 = this.data.list[index]
+          let obj = JSON.parse(JSON.stringify(temp1))
+          this.modal.data = obj
+        }
         this.modal.show = true
-
       },
       /**
        * @description 关闭模态窗口
@@ -375,16 +356,90 @@
       /**
        * @description 确定按钮单击回调
        */
-      ok () {
+      async ok () {
         this.$refs.modalForm.validate(valid => {
           if (valid) {
             this.modal.loading = true
-            this.$Message.success('照片添加成功')
-            this.modal.loading = false
-            this.modal.show = false
+            let url = ''
+            if (this.typeOperation === 'update') {
+              url = this.$url.informationUpdate
+              this.data.list[this.updateIndex] = this.modal.data
+            } else {
+              url = this.$url.informationAdd
+            }
+            this.modal.loading = true
+            this.updateAdd(url)
+          }
+        })
+      },
+      async updateAdd (url) {
+
+        if (this.typeOperation == 'update') {
+          try {
+            debugger
+            let res = await put(url, this.modal.data)
+            if (res.status === 1) {
+              debugger
+              this.modal.loading = false
+              this.$Message.success('操作成功')
+              let data = JSON.parse(JSON.stringify(this.modal.data))
+              this.data.list.push(data)
+            } else {
+              this.$Message.error('操作失败')
+            }
+          } catch (error) {
+            this.$throw(error)
+          }
+        } else {
+          try {
+            debugger
+            let res = await post(url, this.modal.data)
+            debugger
+            console.log(res)
+            if (res.status === 1) {
+              this.modal.loading = false
+              this.$Message.success('操作成功')
+              let data = JSON.parse(JSON.stringify(this.modal.data))
+              if (this.typeOperation != 'update') {
+                this.data.list.push(data)
+              }
+            } else {
+              this.$Message.error('操作失败')
+            }
+          } catch (error) {
+            this.$throw(error)
           }
 
-        })
+        }
+
+        this.modal.loading = false
+        this.modal.show = false
+
+      },
+      /**
+       * @Description 确认删除事件
+       */
+      confirmDelete() {
+        this.delete()
+      },
+      async delete() {
+        this.removeModal.loading = true
+        try {
+          let res = await del(this.$url.informationDelete,{informaId:this.data.list[this.removeObject.index].informaId})
+          console.log(res)
+          debugger
+          if (res.status === 1) {
+            this.modal.loading = false
+            this.data.list.splice(this.removeObject.index, 1)
+            this.$Message.success('删除成功！')
+            this.removeModal.show = false
+            this.removeModal.loading = false
+          } else {
+            this.$Message.error('删除失败！')
+          }
+        } catch (error) {
+          this.$throw(error)
+        }
       },
       change (val) {
         // console.log(val)

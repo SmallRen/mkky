@@ -19,6 +19,15 @@
                 </Input>
               </FormItem>
               <FormItem>
+                <RadioGroup v-model="this.formItem.state">
+                  <Radio label="0">普通用户</Radio>
+                  <Radio label="1">管理员</Radio>
+                  <Radio label="2">超级管理员</Radio>
+                </RadioGroup>
+              </FormItem>
+
+
+              <FormItem>
                 <Checkbox :disabled="isValidate" v-model="formItem.agree">下次登录记住我的身份</Checkbox>
                 <br>
                 <Button :loading="isSubmit" :disabled="isValidate" html-type="submit" type="primary">
@@ -44,6 +53,7 @@
         formItem: {
           account: '',
           password: '',
+          state:'0',
           validateCode: '',
           agree: true
         },
@@ -83,8 +93,9 @@
           let res = await post(this.$url.login, {
             user_phone: this.formItem.account,
             user_word: this.formItem.password,
-            state: 0,
+            state: this.formItem.state,
           })
+          debugger
           console.log(res)
           if (res.status == 1) {
             let data = qs.stringify(res.data.user);

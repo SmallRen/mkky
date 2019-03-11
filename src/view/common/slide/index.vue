@@ -89,7 +89,7 @@
             rotationId: '',
             rotationImg: '',
             rotationConnet: '',
-            rotationState: ''
+            rotationState: '0'
           }
         },
         isClear: false,
@@ -126,13 +126,14 @@
             this.modal.data.rotationId = ''
             this.modal.data.rotationImg = ''
             this.modal.data.rotationConnet = ''
-            this.modal.data.rotationState = ''
           } else {
             this.typeOperation = 'update'
             this.updateIndex = index
             let temp1 = this.img[index]
             let obj = JSON.parse(JSON.stringify(temp1))
+            debugger
             this.modal.data = obj
+            this.modal.data.rotationState=this.modal.data.rotationState+""
           }
           this.modal.show = true
         },
@@ -171,7 +172,6 @@
               let url = ''
               if (this.typeOperation === 'update') {
                 url = this.$url.updateRotationChart
-                let a=this.modal.data
                 this.img[this.updateIndex] = this.modal.data
                 debugger
               } else {
@@ -186,13 +186,17 @@
           try {
             let res = await post(url, this.modal.data)
             console.log(res)
+
             if (res.status === 1) {
               this.modal.loading = false
               this.$Message.success('操作成功')
               let data = JSON.parse(JSON.stringify(this.modal.data))
-              this.img.push(data)
+              if(this.typeOperation != 'update'){
+                this.img.push(data)
+              }
+
             } else {
-              this.$Message.success('操作失败')
+              this.$Message.error('操作失败')
             }
           } catch (error) {
             this.$throw(error)

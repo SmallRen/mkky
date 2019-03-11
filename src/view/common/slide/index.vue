@@ -6,7 +6,7 @@
         <Button type="success" @click="attribute('add')">添加</Button>
       </Card>
 
-      <div v-for="(item,index) in img" v-bind:key="item">
+      <div v-for="(item,index) in img" >
         <Col span="4" class="c-col">
           <Card class="c-height">
             <p slot="title">
@@ -171,7 +171,9 @@
               let url = ''
               if (this.typeOperation === 'update') {
                 url = this.$url.updateRotationChart
+                let a=this.modal.data
                 this.img[this.updateIndex] = this.modal.data
+                debugger
               } else {
                 url = this.$url.addRotationChart
               }
@@ -207,7 +209,7 @@
         async delete() {
           this.removeModal.loading = true
           try {
-            let res = await del(this.$url.deleteRotationChart, this.img[this.deleteIndex].rotationId)
+            let res = await del(this.$url.deleteRotationChart,{rotationId:this.img[this.deleteIndex].rotationId})
             console.log(res)
             if (res.status === 1) {
               this.modal.loading = false
@@ -216,7 +218,7 @@
               this.removeModal.show = false
               this.removeModal.loading = false
             } else {
-              this.$Message.success('删除失败！')
+              this.$Message.error('删除失败！')
             }
           } catch (error) {
             this.$throw(error)

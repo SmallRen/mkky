@@ -1,17 +1,14 @@
 <template>
   <div>
-    <Modal v-model="show" title="添加用户"
+    <Modal v-model="show" title="更新用户"
             :mask-closable="false" :closable="false">
         <Form ref="modalForm" :model="data" :rules="ruls"
                     :label-width="80">
+            <FormItem label="ID">
+                <Input disabled v-model.trim="data.id"></Input>
+            </FormItem>
             <FormItem label="用户名" prop="username">
                 <Input v-model.trim="data.username"></Input>
-            </FormItem>
-            <FormItem label="密码" prop="password">
-                <Input type="password" v-model.trim="data.password"></Input>
-            </FormItem>
-            <FormItem label="重复密码" prop="rePassword">
-                <Input type="password" v-model.trim="data.rePassword"></Input>
             </FormItem>
             <FormItem label="年龄" prop="age">
                 <InputNumber :min="0" :step="1" v-model.trim="data.age" style="width:100%"/>
@@ -39,24 +36,14 @@
 import { post } from '@/libs/axios-cfg'
 export default {
   data() {
-    const validateConfirmPwd = (rule, value, callback) => {
-      if (value === "") {
-        callback(new Error("请再次输入密码"));
-      } else if (value !== this.data.password) {
-        callback(new Error("两次输入密码不一致!"));
-      } else {
-        callback();
-      }
-    };
     return {
       show: true,
       loading: false,
       data: {
+        id:0,
         username: "",
         age: 0,
         status: 1,
-        password: "",
-        rePassword: "",
         roles: []
       },
       ruls: {
@@ -64,11 +51,6 @@ export default {
             { required: true, message: "用户名不能为空" },
             {pattern:/^(\w){4,16}$/,message:'用户名应为[A-Za-z0-9_]组成的4-16位字符'}
         ],
-        password: [
-          { required: true, message: "请填写密码"},
-          {pattern:/^(\w){6,18}$/,message:'密码应为[A-Za-z0-9_]组成的6-18位字符'}
-        ],
-        rePassword: [{ validator: validateConfirmPwd }],
         age: [{ required: true, message: "年龄不能为空" }],
         status: [{ required: true, message: "用户状态不能为空" }],
         roles: [{ required: true, message: "请至少选择一个角色" }]
@@ -79,7 +61,14 @@ export default {
     roles: {
       type: Array,
       default: []
+    },
+    uid:{
+        type:String,
+        default:{}
     }
+  },
+  created(){
+      this.getUserInfo();
   },
   methods: {
     /**
@@ -87,7 +76,32 @@ export default {
      * @param reload 是否重新加载数据
      */
     cancel(reload = false) {
-      this.$emit("cancel", "add", reload);
+      this.$emit("cancel", "update", reload);
+    },
+    /**
+     * @description 获取用户信息
+     */
+    async getUserInfo(){
+        try {
+            let res = await post('/system/user/get/id/{id}',null,{
+                id:this.uid
+            })
+            this.data = res.data;
+            //进行角色的匹配
+            let roles = []
+            if(this.data.roles!=null){
+                this.data.roles.forEach(el=>{
+                    this.roles.forEach((r,index)=>{
+                        if(el.id == r.id){ //判断当前用户角色列表中的角色ID是否和全部角色列表中的对应
+                            roles.push(index) //对应则加入当前角色的数组下标
+                        }
+                    })
+                })
+            }
+            this.data.roles = roles;
+        } catch (error) {
+            this.$throw(error)
+        }
     },
     /**
      * @description 确定按钮单击回调
@@ -101,18 +115,20 @@ export default {
             })
             let data = JSON.parse(JSON.stringify(this.data));
             data.roles = roles;
-            this.add(data)
+            this.update(data)
         }
       });
     },
     /**
-     * @description 添加用户数据请求
+     * @description 更新用户数据请求
      */
-    async add(data){
+    async update(data){
         this.loading = true;
         try {
-            let res = await post('/system/user/add',data)
-            this.$Message.success("用户 "+data.username+" 添加成功");
+            let res = await post('/system/user/update/{id}',data,{
+                id:this.data.id
+            })
+            this.$Message.success("用户 "+data.username+" 更新成功");
             this.cancel(true)
         } catch (error) {
             this.$throw(error)

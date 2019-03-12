@@ -41,26 +41,11 @@
     </Card>
     <Modal v-model="modal.show" title="属性"
            :mask-closable="false" :closable="false" :width="800">
-      <Form ref="modalForm" :model="modal.informaHeadline" :label-width="80">
-        <FormItem label="标题" prop="informaHeadline">
-          <Input v-model.trim="modal.data.informaHeadline"></Input>
-        </FormItem>
-        <FormItem label="图片地址" prop="informa_img">
-          <Input v-model.trim="modal.data.informa_img"></Input>
-        </FormItem>
-        <FormItem label="内容" prop="informaContent">
-          <Editor v-model="modal.data.informaContent" :isClear="editor.isClear" @change="change"></Editor>
-        </FormItem>
-        <FormItem label="资讯时间" prop="informaTime">
-
-          <DatePicker type="datetime" format="yyyy-MM-dd HH:mm" v-model="modal.data.informaTime"   placeholder="" style="width: 200px"></DatePicker>
-        </FormItem>
-
-
-        <FormItem label="资讯状态" prop="informaState">
-          <RadioGroup v-model="modal.data.informaState">
-            <Radio label="0">上架</Radio>
-            <Radio label="1">下架</Radio>
+      <Form ref="modalForm" :model="modal" :label-width="80">
+        <FormItem label="资讯状态" prop="currencyState">
+          <RadioGroup v-model="modal.data.currencyState">
+            <Radio label="0">上线</Radio>
+            <Radio label="1">未上线</Radio>
           </RadioGroup>
         </FormItem>
       </Form>
@@ -71,15 +56,12 @@
     </Modal>
     <Modal v-model="modal2.show" title="属性"
            :mask-closable="false" :closable="false" :width="800">
-      <Form ref="modalForm2" :model="modal2.informaHeadline" :label-width="80">
-        <FormItem label="标题" prop="informaHeadline">
-          <Input v-model.trim="modal2.data.informaHeadline"></Input>
+      <Form ref="modalForm2" :model="modal2" :label-width="80">
+        <FormItem label="标题" prop="currencyName">
+          <Input v-model.trim="modal2.data.currencyName"></Input>
         </FormItem>
-        <FormItem label="图片地址" prop="informa_img">
-          <Input v-model.trim="modal2.data.informa_img"></Input>
-        </FormItem>
-        <FormItem label="内容" prop="informaContent">
-          <Editor v-model="modal2.data.informaContent" :isClear="editor.isClear"></Editor>
+        <FormItem label="图片地址" prop="currencyImg">
+          <Input v-model.trim="modal2.data.currencyImg"></Input>
         </FormItem>
       </Form>
       <div slot="footer">
@@ -100,16 +82,11 @@
         <Button type="error" size="large" long :loading="removeModal.loading" @click="confirmDelete()">确认删除</Button>
       </div>
     </Modal>
-
-    <Update v-if="updateUserModal" :roles="roles" :uid="updateUserId" @cancel="onModalCancel"/>
   </div>
 </template>
 <script>
   import dayjs from 'dayjs'
   import { post, get, put, del } from '@/libs/axios-cfg'
-  import Update from './components/update.vue'
-  import Editor from './components/editor.vue'
-  import imgUp from './components/imgUp.vue'
   import './index.less'
 
   export default {
@@ -133,12 +110,10 @@
           loading: false,
           show: false,
           data: {
-            informaId: '',
-            informaHeadline: '',
-            informaContent: '',
-            informa_img: '',
-            informaTime: '',
-            informaState: '0'
+            currencyId: '',
+            currencyName: '',
+            currencyImg: '',
+            currencyState: ''
           }
         },
 
@@ -152,9 +127,8 @@
           loading: false,
           show: false,
           data: {
-            informaHeadline: '',
-            informaContent: '',
-            informa_img: ''
+            currencyName: '',
+            currencyImg: ''
           }
         },
         editor: {
@@ -171,29 +145,19 @@
             width: 60,
             align: 'center'
           },
-          { title: '资讯id', key: 'informaId', sortable: true, align: 'center', width: 300, },
-          { title: '资讯名称', key: 'informaHeadline', sortable: true, align: 'center', width: 180, },
-          { title: '资讯图片url', key: 'informa_img', sortable: true, align: 'center', width: 300, },
-          { title: '资讯内容', key: 'informa_img', sortable: true, align: 'center', },
-          {
-            title: '创建日期',
-            key: 'informaTime', width: 180,
-            render: (h, params) => {
-              return h('span', dayjs(params.row.informaTime).format('YYYY年MM月DD日 HH:mm:ss'))
-            },
-
-            sortable: true
-          },
+          { title: '种类ID', key: 'currencyId', sortable: true, align: 'center', width: 300, },
+          { title: '币种名称', key: 'currencyName', sortable: true, align: 'center', width: 180, },
+          { title: '币种图片url', key: 'currencyImg', sortable: true, align: 'center',   },
           {
             title: '状态',
             key: 'action',
             width: 160,
             align: 'center',
             render: (h, params) => {
-              if (params.row.informaState == 0) {
-                return h('Tag', { props: { color: 'blue' } }, '上架')
+              if (params.row.currencyState == 0) {
+                return h('Tag', { props: { color: 'success' } }, '上线')
               } else {
-                return h('Tag', { props: { color: 'red' } }, '下架')
+                return h('Tag', { props: { color: 'warning' } }, '未上线')
               }
 
             },
@@ -241,7 +205,7 @@
       }
     },
     components: {
-      Update, Editor, imgUp
+
     },
     created () {
       this.getData()
@@ -327,7 +291,7 @@
       async getData () {
         this.setting.loading = true
         try {
-          let res = await get(this.$url.informationList, {
+          let res = await get(this.$url.currencyList, {
             page: this.dataFilter.page,
             limit: this.dataFilter.limit
           })
@@ -338,9 +302,10 @@
         this.setting.loading = false
       },
       modalAdd () {
-        this.modal2.data.informaHeadline = ''
-        this.modal2.data.informaContent = ''
-        this.modal2.data.informa_img = ''
+        this.modal2.data.currencyId = ''
+        this.modal2.data.currencyName = ''
+        this.modal2.data.currencyImg = ''
+        this.modal2.data.currencyState = ''
         this.modal2.show = true
       },
       /**
@@ -352,8 +317,7 @@
         let temp1 = this.data.list[index]
         let obj = JSON.parse(JSON.stringify(temp1))
         this.modal.data = obj
-        this.modal.data.informaState = this.modal.data.informaState + ''
-        this.modal.data.informaTime = dayjs(this.modal.data.informaTime).format('YYYY年MM月DD日 HH:mm:ss')
+        this.modal.data.currencyState = this.modal.data.currencyState + ''
         this.modal.show = true
       },
       /**
@@ -411,9 +375,8 @@
           if (valid) {
             this.modal.loading = true
             let url = ''
-            url = this.$url.informationUpdate
+            url = this.$url.currencyUpdate
             this.modal.loading = true
-
             this.update(url)
           }
         })
@@ -423,19 +386,20 @@
             if (valid) {
               this.modal2.loading = true
               let url = ''
-              url = this.$url.informationAdd
+              url = this.$url.currencyAdd
               this.modal2.loading = true
               this.add(url)
 
             } else {
-              alert('fg')
+
             }
           }
         )
       },
       async add (url) {
         try {
-          let res = await post(url, this.modal2.data)
+          let res = await put(url, this.modal2.data)
+          debugger
           console.log(res)
           if (res.status === 1) {
             this.modal2.loading = false
@@ -454,7 +418,7 @@
       async update (url) {
         try {
           let res = await put(url, this.modal.data)
-
+          debugger
           if (res.status === 1) {
             this.modal.loading = false
             this.$Message.success('操作成功')
@@ -481,7 +445,7 @@
       async delete () {
         this.removeModal.loading = true
         try {
-          let res = await del(this.$url.informationDelete, { informaId: this.data.list[this.removeObject.index].informaId })
+          let res = await del(this.$url.currencyDelete, { currencyId: this.data.list[this.removeObject.index].currencyId })
           console.log(res)
           debugger
           if (res.status === 1) {

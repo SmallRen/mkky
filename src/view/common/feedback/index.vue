@@ -3,22 +3,19 @@
     <Card>
       <p slot="title" class="card-title">
         <Icon type="home"></Icon>
-        <span>矿机管理</span>
+        <span>资讯管理</span>
       </p>
       <div>
         <template>
           <Row>
             <Col span="15">
-              <Button type="info" @click="openAddModal(null)">
-                <Icon type="md-add"></Icon>&nbsp;添加
-              </Button>
+
               <Button :disabled="setting.loading" type="success" @click="getData">
                 <Icon type="md-refresh"></Icon>&nbsp;刷新数据
               </Button>
               <Button type="primary" @click="exportData(1)">
                 <Icon type="ios-download-outline"></Icon>&nbsp;导出表格
               </Button>
-
             </Col>
             <Col span="9">
               <Input v-model="search.value" placeholder="请输入您想要搜索的内容..." @click="find()" class="margin-bottom-10">
@@ -28,14 +25,16 @@
           </Row>
           <Table ref="table" class="margin-bottom-10" @on-selection-change="selectionChange"
                  :columns="columns" :loading="setting.loading" :border="setting.showBorder"
-                 :data="data.list"></Table>
+                 :data="data.list">
+
+          </Table>
           <Page :total="data.total" class="tr" @on-change="pageChange"
                 :page-size="data.pageSize"
                 @on-page-size-change="pageSizeChange" show-elevator show-sizer></Page>
         </template>
       </div>
     </Card>
-    <Modal v-model="removeModal" width="360">
+    <Modal v-model="removeModal.show" width="360">
       <p slot="header" style="color:#f60;text-align:center">
         <Icon type="information-circled"></Icon>
         <span>提示</span>
@@ -44,26 +43,27 @@
         <p>此操作为不可逆操作，是否确认删除？</p>
       </div>
       <div slot="footer">
-        <Button type="error" size="large" long :loading="setting.loading" @click="removeUser">确认删除</Button>
+        <Button type="error" size="large" long :loading="removeModal.loading" @click="confirmDelete()">确认删除</Button>
       </div>
     </Modal>
-    <Add v-if="addUserModal" :roles="roles" @cancel="onModalCancel"/>
-    <Update v-if="updateUserModal" :roles="roles" :uid="updateUserId" @cancel="onModalCancel"/>
+
   </div>
 </template>
 <script>
   import dayjs from 'dayjs'
-  import { post,get } from '@/libs/axios-cfg'
+  import { post, get, put, del } from '@/libs/axios-cfg'
+  import Update from './components/update.vue'
+  import Editor from './components/editor.vue'
+  import imgUp from './components/imgUp.vue'
+  import './index.less'
+
   export default {
     data () {
       return {
-        addUserModal: false,
-        updateUserModal: false,
-        resetPasswordModal: false,
-        updateUserId: null,
-        resetPasswordUser: null,
         selections: [],
-        removeModal: false,
+        removeModal: {
+          show: false
+        },
         setting: {
           loading: true,
           showBorder: true
@@ -78,32 +78,26 @@
             width: 60,
             align: 'center'
           },
-          { title: 'ID （硬件信息）', key: 'machineId', sortable: true },
-          { title: '矿机名称', key: 'machineName', sortable: true },
-          { title: '每个矿机ip', key: 'machineIp', sortable: true },
-          { title: '矿机的端口', key: 'machinePort', sortable: true },
-          { title: 'MAC地址', key: 'macAddress', sortable: true },
-          { title: '矿机型号', key: 'nameOfMine', sortable: true },
-          { title: '系统版本', key: 'systemVersion', sortable: true },
-          { title: '内网IP地址', key: 'ipAddress', sortable: true },
+          { title: '意见反馈id', key: 'feedback_id', sortable: true, align: 'center', width: 300, },
+          { title: '反馈用户', key: 'feedback_user', sortable: true, align: 'center', width: 180, },
+          { title: '资讯图片url', key: 'feedback_comment', sortable: true, align: 'center', },
+          {
+            title: '创建日期',
+            key: 'feedback_Time', width: 180,
+            render: (h, params) => {
+              return h('span', dayjs(params.row.feedback_Time).format('YYYY年MM月DD日 HH:mm:ss'))
+            },
+
+            sortable: true
+          },
 
           {
             title: '操作',
             key: 'action',
-            width: 260,
+            width: 160,
             align: 'center',
             render: (h, params) => {
               return h('div', [
-                h('Button', {
-                  props: {type: 'primary',size: 'small'},
-                  style: {marginRight: '5px'},
-                  on:{
-                    click:()=>{
-                      this.openAddModal(params.row.id)
-                    }
-                  }
-                }, '修改'),
-
                 h('Button', {
                   props: { type: 'error', size: 'small' },
                   on: {
@@ -112,7 +106,7 @@
                         obj: params.row,
                         index: params.index
                       }
-                      this.removeModal = true
+                      this.removeModal.show = true
                     }
                   }
                 }, '删除')
@@ -120,17 +114,16 @@
             }
           }
         ],
-        data: {},
+        data: [],
         dataFilter: {
           page: 1,
-          pageSize: 10
+          limit: 10
         },
         removeObject: null,
         roles: null
       }
     },
-    components: {
-    },
+    components: {},
     created () {
       this.getData()
     },
@@ -155,92 +148,25 @@
         this.dataFilter.pageSize = p
         this.getData()
       },
-
       async find () {
 
       },
       /**
-       * @description 删除用户
-       */
-      async removeUser () {
-        this.removeModal = false
-        if (this.removeObject == null) {
-          this.$Message.warning('删除对象为空，无法继续执行！')
-          return false
-        }
-        this.setting.loading = true
-        this.data.records.splice(this.removeObject.index, 1)
-        this.setting.loading = false
-      },
-
-      /**
-       * @description 获取用户列表
+       * @description 获取反馈列表
        */
       async getData () {
         this.setting.loading = true
         try {
-           let res = await get(this.$url.listMiningMachine, {
+          let res = await get(this.$url.getUserFeedbackList, {
             page: this.dataFilter.page,
-            rows: this.dataFilter.pageSize
+            rows: this.dataFilter.limit
           })
-          if (res.status === 1) {
-            this.data = res.data
-          } else {
-            this.$Message.error('操作失败')
-          }
-
-
+          debugger
+          this.data = res.data
         } catch (error) {
           this.$throw(error)
-
         }
         this.setting.loading = false
-      },
-      /**
-       * @description 打开模态窗口
-       * @param uid 用户ID
-       * @param type 打开类型
-       */
-      openAddModal(uid,type = 'update'){
-        if(uid==null || type==='update'){
-          if(this.roles==null){
-            this.getRoleList();
-          }
-        }
-        if(uid==null){
-          this.addUserModal = true;
-        }else if(type==='update'){
-          this.updateUserId = uid;
-          this.updateUserModal = true;
-        }else{
-          this.resetPasswordUser = uid;
-          this.resetPasswordModal = true;
-        }
-      },
-      /**
-       * @description 关闭模态窗口
-       * @param type 窗口类型
-       * @param reload 是否重新加载数据
-       */
-      onModalCancel (type, reload = false) {
-        switch (type) {
-          case 'add': {
-            this.addUserModal = false
-          }
-
-            break
-          case 'update': {
-            this.updateUserModal = false
-          }
-
-            break
-          case 'resetPassword': {
-            this.resetPasswordModal = false
-          }
-
-            break
-        }
-        if (reload) this.getData()
       },
       /**
        * @description 导出表格CSV
@@ -253,7 +179,39 @@
             data: this.data
           })
         }
+      },
+      /**
+       * @Description 确认删除事件
+       */
+      confirmDelete () {
+        this.delete()
       }
+      ,
+      async delete () {
+        this.removeModal.loading = true
+        try {
+          let res = await del(this.$url.deleteUserFeedback, { feedbackId: this.data.list[this.removeObject.index].feedback_id })
+          console.log(res)
+          debugger
+          if (res.status === 1) {
+            this.modal.loading = false
+            this.data.list.splice(this.removeObject.index, 1)
+            this.$Message.success('删除成功！')
+            this.removeModal.show = false
+            this.removeModal.loading = false
+          } else {
+            this.$Message.error('删除失败！')
+          }
+        } catch (error) {
+          this.$throw(error)
+        }
+      }
+      ,
+      change (val) {
+        // console.log(val)
+        //this.img.courseContent = val
+      }
+      ,
     }
   }
 </script>

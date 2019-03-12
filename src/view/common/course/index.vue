@@ -41,24 +41,23 @@
     </Card>
     <Modal v-model="modal.show" title="属性"
            :mask-closable="false" :closable="false" :width="800">
-      <Form ref="modalForm" :model="modal.informaHeadline" :label-width="80">
-        <FormItem label="标题" prop="informaHeadline">
-          <Input v-model.trim="modal.data.informaHeadline"></Input>
+      <Form ref="modalForm" :model="modal" :label-width="80"  >
+        <FormItem label="标题" prop="courseExplain">
+          <Input v-model.trim="modal.data.courseExplain"></Input>
         </FormItem>
-        <FormItem label="图片地址" prop="informa_img">
-          <Input v-model.trim="modal.data.informa_img"></Input>
+        <FormItem label="图片地址" prop="courseImg">
+          <Input v-model.trim="modal.data.courseImg"></Input>
         </FormItem>
-        <FormItem label="内容" prop="informaContent">
-          <Editor v-model="modal.data.informaContent" :isClear="editor.isClear" @change="change"></Editor>
+        <FormItem label="内容" prop="courseContent">
+          <Editor v-model="modal.data.courseContent" :isClear="editor.isClear" @change="change"></Editor>
         </FormItem>
-        <FormItem label="资讯时间" prop="informaTime">
+        <FormItem label="资讯时间" prop="contentTime">
+          <Input v-model="modal.data.contentTime" :isClear="editor.isClear" @change="change"></Input>
+        </FormItem>
 
-          <DatePicker type="datetime" format="yyyy-MM-dd HH:mm" v-model="modal.data.informaTime"   placeholder="" style="width: 200px"></DatePicker>
-        </FormItem>
 
-
-        <FormItem label="资讯状态" prop="informaState">
-          <RadioGroup v-model="modal.data.informaState">
+        <FormItem label="资讯状态" prop="contentState">
+          <RadioGroup v-model="modal.data.contentState">
             <Radio label="0">上架</Radio>
             <Radio label="1">下架</Radio>
           </RadioGroup>
@@ -71,15 +70,15 @@
     </Modal>
     <Modal v-model="modal2.show" title="属性"
            :mask-closable="false" :closable="false" :width="800">
-      <Form ref="modalForm2" :model="modal2.informaHeadline" :label-width="80">
-        <FormItem label="标题" prop="informaHeadline">
-          <Input v-model.trim="modal2.data.informaHeadline"></Input>
+      <Form ref="modalForm2" :model="modal2" :label-width="80"   >
+        <FormItem label="标题" prop="courseExplain">
+          <Input v-model.trim="modal2.data.courseExplain"></Input>
         </FormItem>
-        <FormItem label="图片地址" prop="informa_img">
-          <Input v-model.trim="modal2.data.informa_img"></Input>
+        <FormItem label="图片地址" prop="courseImg">
+          <Input v-model.trim="modal2.data.courseImg"></Input>
         </FormItem>
-        <FormItem label="内容" prop="informaContent">
-          <Editor v-model="modal2.data.informaContent" :isClear="editor.isClear"></Editor>
+        <FormItem label="内容" prop="courseContent">
+          <Editor v-model="modal2.data.courseContent" :isClear="editor.isClear"></Editor>
         </FormItem>
       </Form>
       <div slot="footer">
@@ -100,8 +99,6 @@
         <Button type="error" size="large" long :loading="removeModal.loading" @click="confirmDelete()">确认删除</Button>
       </div>
     </Modal>
-
-    <Update v-if="updateUserModal" :roles="roles" :uid="updateUserId" @cancel="onModalCancel"/>
   </div>
 </template>
 <script>
@@ -115,13 +112,9 @@
   export default {
     data () {
       return {
+        selections:[],
         updateIndex: '',
         typeOperation: '',
-        updateUserModal: false,
-        resetPasswordModal: false,
-        updateUserId: null,
-        resetPasswordUser: null,
-        selections: [],
         removeModal: {
           show: false
         },
@@ -133,28 +126,33 @@
           loading: false,
           show: false,
           data: {
-            informaId: '',
-            informaHeadline: '',
-            informaContent: '',
-            informa_img: '',
-            informaTime: '',
-            informaState: '0'
+            courseId: '',
+            courseExplain: '',
+            courseImg: '',
+            contentTime: '',
+            contentState:  '0',
+            courseContent:''
+          },
+          addRules: {
+            courseExplain: [{ required: true, message: '标题不能为空' }],
+            courseImg: [{ required: true, message: '内容不能为空' }],
+            courseContent: [{ required: true, message: '地址不能为空' }],
           }
         },
 
         modal2: {
           addRules: {
-            informaHeadline: [{ required: true, message: '标题不能为空' }],
-            informaContent: [{ required: true, message: '内容不能为空' }],
-            informa_img: [{ required: true, message: '地址不能为空' }],
+            courseExplain: [{ required: true, message: '标题不能为空' }],
+            courseImg: [{ required: true, message: '内容不能为空' }],
+            courseContent: [{ required: true, message: '地址不能为空' }],
           },
 
           loading: false,
           show: false,
           data: {
-            informaHeadline: '',
-            informaContent: '',
-            informa_img: ''
+            courseExplain: '',
+            courseImg: '',
+            courseContent: ''
           }
         },
         editor: {
@@ -171,15 +169,14 @@
             width: 60,
             align: 'center'
           },
-          { title: '资讯id', key: 'informaId', sortable: true, align: 'center', width: 300, },
-          { title: '资讯名称', key: 'informaHeadline', sortable: true, align: 'center', width: 180, },
-          { title: '资讯图片url', key: 'informa_img', sortable: true, align: 'center', width: 300, },
-          { title: '资讯内容', key: 'informa_img', sortable: true, align: 'center', },
-          {
-            title: '创建日期',
-            key: 'informaTime', width: 180,
+          { title: '教程ID', key: 'courseId', sortable: true, align: 'center', width: 300, },
+          { title: '教程标题', key: 'courseExplain', sortable: true, align: 'center', width: 180, },
+          { title: '封面图', key: 'courseImg', sortable: true, align: 'center',   },
+           {
+            title: '发布时间',
+            key: 'contentTime', width: 180,
             render: (h, params) => {
-              return h('span', dayjs(params.row.informaTime).format('YYYY年MM月DD日 HH:mm:ss'))
+              return h('span', dayjs(params.row.contentTime).format('YYYY年MM月DD日 HH:mm:ss'))
             },
 
             sortable: true
@@ -190,10 +187,13 @@
             width: 160,
             align: 'center',
             render: (h, params) => {
-              if (params.row.informaState == 0) {
-                return h('Tag', { props: { color: 'blue' } }, '上架')
-              } else {
-                return h('Tag', { props: { color: 'red' } }, '下架')
+              if (params.row.contentState == 0) {
+                return h('Tag', { props: { color: 'primary' } }, '普通用户')
+              } else if (params.row.contentState == 1){
+                return h('Tag', { props: { color: 'warning' } }, '管理员')
+              }
+              else{
+                return h('Tag', { props: { color: 'success' } }, '超级管理员')
               }
 
             },
@@ -234,7 +234,7 @@
         data: [],
         dataFilter: {
           page: 1,
-          limit: 10
+          pageSize: 10
         },
         removeObject: null,
         roles: null
@@ -327,10 +327,11 @@
       async getData () {
         this.setting.loading = true
         try {
-          let res = await get(this.$url.informationList, {
+          let res = await get(this.$url.getCourseList, {
             page: this.dataFilter.page,
-            limit: this.dataFilter.limit
+            rows: this.dataFilter.pageSize
           })
+          debugger
           this.data = res.data
         } catch (error) {
           this.$throw(error)
@@ -352,8 +353,8 @@
         let temp1 = this.data.list[index]
         let obj = JSON.parse(JSON.stringify(temp1))
         this.modal.data = obj
-        this.modal.data.informaState = this.modal.data.informaState + ''
-        this.modal.data.informaTime = dayjs(this.modal.data.informaTime).format('YYYY年MM月DD日 HH:mm:ss')
+        this.modal.data.contentState = this.modal.data.contentState + ''
+        this.modal.data.contentTime = dayjs(this.modal.data.contentTime).format('YYYY年MM月DD日 HH:mm:ss')
         this.modal.show = true
       },
       /**
@@ -413,7 +414,6 @@
             let url = ''
             url = this.$url.informationUpdate
             this.modal.loading = true
-
             this.update(url)
           }
         })
@@ -454,7 +454,6 @@
       async update (url) {
         try {
           let res = await put(url, this.modal.data)
-
           if (res.status === 1) {
             this.modal.loading = false
             this.$Message.success('操作成功')
@@ -481,9 +480,8 @@
       async delete () {
         this.removeModal.loading = true
         try {
-          let res = await del(this.$url.informationDelete, { informaId: this.data.list[this.removeObject.index].informaId })
+          let res = await get(this.$url.getDeleteCourse, { course_id: this.data.list[this.removeObject.index].course_id })
           console.log(res)
-          debugger
           if (res.status === 1) {
             this.modal.loading = false
             this.data.list.splice(this.removeObject.index, 1)

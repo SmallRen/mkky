@@ -52,8 +52,7 @@
           <Editor v-model="modal.data.informaContent" :isClear="editor.isClear" @change="change"></Editor>
         </FormItem>
         <FormItem label="资讯时间" prop="informaTime">
-
-          <DatePicker type="datetime" format="yyyy-MM-dd HH:mm" v-model="modal.data.informaTime"   placeholder="" style="width: 200px"></DatePicker>
+          <Input v-model="modal.data.informaTime" :isClear="editor.isClear" @change="change"></Input>
         </FormItem>
 
 
@@ -327,9 +326,9 @@
       async getData () {
         this.setting.loading = true
         try {
-          let res = await get(this.$url.informationList, {
+          let res = await post(this.$url.getSoftwareUpdates, {
             page: this.dataFilter.page,
-            limit: this.dataFilter.limit
+            rows: this.dataFilter.limit
           })
           this.data = res.data
         } catch (error) {
@@ -413,7 +412,6 @@
             let url = ''
             url = this.$url.informationUpdate
             this.modal.loading = true
-
             this.update(url)
           }
         })
@@ -454,7 +452,6 @@
       async update (url) {
         try {
           let res = await put(url, this.modal.data)
-
           if (res.status === 1) {
             this.modal.loading = false
             this.$Message.success('操作成功')

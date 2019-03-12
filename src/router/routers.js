@@ -86,9 +86,25 @@ export default [
       { path: 'slide',meta:{icon: 'md-people', title: '轮播图管理'}, name: 'slide', component: () => import('@/view/common/slide') },
       { path: 'information',meta:{icon: 'md-people', title: '资讯管理'}, name: 'information', component: () => import('@/view/common/information') },
       { path: 'order',meta:{icon: 'md-body',title: '订单管理'}, name: 'order', component: () => import('@/view/common/order') },
-      { path: 'wallet',meta:{icon: 'ios-lock',title: '钱包管理'}, name: 'wallet', component: () => import('@/view/common/wallet') },
+      { path: 'wallet',meta:{icon: 'ios-lock',title: '转账管理'}, name: 'wallet', component: () => import('@/view/common/wallet') },
+      { path: 'course',meta:{icon: 'ios-lock',title: '教程管理'}, name: 'course', component: () => import('@/view/common/course') },
       { path: 'mill',meta:{icon: 'ios-aperture',title: '矿机管理'}, name: 'mill', component: () => import('@/view/common/mill') },
+      { path: 'currency',meta:{icon: 'ios-aperture',title: '币种管理'}, name: 'currency', component: () => import('@/view/common/currency') },
       { path: 'mill-template',meta:{icon: 'md-basket',title: '矿机模板'}, name: 'template', component: () => import('@/view/common/template') },
+      ]
+  },
+  {
+    path: '/common',
+    name: 'app',
+    component: Main,
+    meta: {
+      title: 'APP管理',
+      icon:'ios-cog'
+    },
+    children:[
+      { path: 'update',meta:{icon: 'md-basket',title: 'app版本更新'}, name: 'update', component: () => import('@/view/common/update') },
+      { path: 'feedback',meta:{icon: 'md-basket',title: 'app意见反馈'}, name: 'feedback', component: () => import('@/view/common/feedback') },
+
     ]
   },
   {

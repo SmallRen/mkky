@@ -9,9 +9,7 @@
         <template>
           <Row>
             <Col span="15">
-              <Button type="info" @click="openAddModal(null)">
-                <Icon type="md-add"></Icon>&nbsp;添加
-              </Button>
+
               <Button :disabled="setting.loading" type="success" @click="getData">
                 <Icon type="md-refresh"></Icon>&nbsp;刷新数据
               </Button>
@@ -28,13 +26,53 @@
           </Row>
           <Table ref="table" class="margin-bottom-10" @on-selection-change="selectionChange"
                  :columns="columns" :loading="setting.loading" :border="setting.showBorder"
-                 :data="data.records"></Table>
-          <Page :total="data.total" class="tr" @on-change="pageChange" :current.sync="data.current"
-                :page-size="data.size"
+                 :data="data.list"></Table>
+          <Page :total="data.total" class="tr" @on-change="pageChange"
+                :page-size="data.pageSize"
                 @on-page-size-change="pageSizeChange" show-elevator show-sizer></Page>
         </template>
       </div>
     </Card>
+
+    <Modal v-model="modal.show" title="属性"
+           :mask-closable="false" :closable="false" :width="800">
+      <Form ref="modalForm" :model="modal" :label-width="80">
+        <FormItem label="用户ID" prop="orderId">
+          <Input v-model.trim="modal.data.orderId"></Input>
+        </FormItem>
+        <FormItem label="矿机ID" prop="machineId">
+          <Input v-model.trim="modal.data.machineId"></Input>
+        </FormItem>
+        <FormItem label="订单描述" prop="orderDescription">
+          <Input v-model.trim="modal.data.orderDescription"></Input>
+        </FormItem>
+        <FormItem label="创建时间" prop="createTime">
+          <DatePicker type="datetime" format="yyyy-MM-dd HH:mm:ss" v-model="modal.data.createTime" placeholder=""
+                      style="width: 200px"></DatePicker>
+        </FormItem>
+        <FormItem label="完成时间" prop="arriveTime">
+          <DatePicker type="datetime" format="yyyy-MM-dd HH:mm:ss" v-model="modal.data.arriveTime" placeholder=""
+                      style="width: 200px"></DatePicker>
+        </FormItem>
+
+        <FormItem label="订单状态" prop="orderStatus">
+          <RadioGroup v-model="modal.data.orderStatus">
+            <Radio label="0">进行中</Radio>
+            <Radio label="1">以完成</Radio>
+          </RadioGroup>
+        </FormItem>
+        <FormItem label="订单状态" prop="orderinfoStatus">
+          <RadioGroup v-model="modal.data.orderinfoStatus">
+            <Radio label="0">添加切换记录</Radio>
+            <Radio label="1">删除切换记录</Radio>
+          </RadioGroup>
+        </FormItem>
+      </Form>
+      <div slot="footer">
+        <Button type="default" :disabled="modal.loading" @click="cancel(false)">取消</Button>
+        <Button type="primary" :loading="modal.loading" @click="ok">确定</Button>
+      </div>
+    </Modal>
     <Modal v-model="removeModal" width="360">
       <p slot="header" style="color:#f60;text-align:center">
         <Icon type="information-circled"></Icon>
@@ -47,15 +85,13 @@
         <Button type="error" size="large" long :loading="setting.loading" @click="removeUser">确认删除</Button>
       </div>
     </Modal>
-    <Add v-if="addUserModal" :roles="roles" @cancel="onModalCancel"/>
-    <Update v-if="updateUserModal" :roles="roles" :uid="updateUserId" @cancel="onModalCancel"/>
+
   </div>
 </template>
 <script>
   import dayjs from 'dayjs'
-  import { post } from '@/libs/axios-cfg'
-  import Add   from './components/add.vue'
-  import Update   from './components/update.vue'
+  import { post, get, del, put } from '@/libs/axios-cfg'
+
   export default {
     data () {
       return {
@@ -70,6 +106,19 @@
           loading: true,
           showBorder: true
         },
+        modal: {
+          show: false,
+          data: {
+            orderId: '',
+            userId: '',
+            machineId: '',
+            createTime: '',
+            arriveTime: '',
+            orderStatus: '',
+            orderinfoStatus: '',
+            orderDescription: '',
+          }
+        },
         search: {
           type: 'name',
           value: ''
@@ -80,21 +129,44 @@
             width: 60,
             align: 'center'
           },
-          { title: '硬件id', key: 'id', sortable: true },
-          { title: '矿机名称', key: 'username', sortable: true },
-          { title: '矿机IP', key: 'age', sortable: true },
+          { title: '订单ID', key: 'orderId', sortable: true },
+          { title: '用户ID', key: 'userId', sortable: true },
+          { title: '矿机Id', key: 'machineId', sortable: true },
           { title: '矿机账号', key: 'age', sortable: true },
           { title: '矿机密码', key: 'age', sortable: true },
           { title: 'MAC地址', key: 'age', sortable: true },
+          {
+            title: '完成时间',
+            key: 'arriveTime',
+            render: (h, params) => {
+              return h('span', dayjs(params.row.arriveTime).format('YYYY年MM月DD日 HH:mm:ss'))
+            },
 
+            sortable: true
+          },
           {
             title: '创建日期',
-            key: 'createDate',
+            key: 'createTime',
             render: (h, params) => {
-              return h('span', dayjs(params.row.createDate).format('YYYY年MM月DD日 HH:mm:ss'))
+              return h('span', dayjs(params.row.createTime).format('YYYY年MM月DD日 HH:mm:ss'))
             },
             sortable: true
           },
+          {
+            title: '订单状态',
+            key: 'action',
+            width: 160,
+            align: 'center',
+            render: (h, params) => {
+              if (params.row.orderStatus == 0) {
+                return h('Tag', { props: { color: 'blue' } }, '进行中')
+              } else {
+                return h('Tag', { props: { color: 'red' } }, '以完成')
+              }
+
+            },
+          },
+
           {
             title: '操作',
             key: 'action',
@@ -103,20 +175,11 @@
             render: (h, params) => {
               return h('div', [
                 h('Button', {
-                  props: { type: params.row.status == 1 ? 'success' : 'warning', size: 'small' },
+                  props: { type: 'primary', size: 'small' },
                   style: { marginRight: '5px' },
                   on: {
                     click: () => {
-
-                    }
-                  }
-                }, '通过'),
-                h('Button', {
-                  props: {type: 'primary',size: 'small'},
-                  style: {marginRight: '5px'},
-                  on:{
-                    click:()=>{
-                      this.openAddModal(params.row.id)
+                      this.updateModel(params.index)
                     }
                   }
                 }, '修改'),
@@ -146,9 +209,7 @@
         roles: null
       }
     },
-    components: {
-      Add,Update
-    },
+    components: {},
     created () {
       this.getData()
     },
@@ -174,7 +235,6 @@
         this.getData()
       },
 
-
       async find () {
 
       },
@@ -198,50 +258,31 @@
       async getData () {
         this.setting.loading = true
         try {
-           /*let res = await post('/system/user/list', {
+          let res = await get(this.$url.getOrderInfo, {
             page: this.dataFilter.page,
-            pageSize: this.dataFilter.pageSize
-          })*/
-          //this.data = res.data
+            rows: this.dataFilter.pageSize,
+            status: 0,
+            number: 1
+          })
+          debugger
+          this.data = res.data
         } catch (error) {
           this.$throw(error)
         }
         this.setting.loading = false
       },
       /**
-       * @description 获取角色列表
-       */
-      async getRoleList () {
-        try {
-          let res = await post('/system/role/list', {
-            page: 1,
-            pageSize: 1000
-          })
-          this.roles = res.data.records
-        } catch (error) {
-          this.$throw(error)
-        }
-      },
-      /**
        * @description 打开模态窗口
        * @param uid 用户ID
        * @param type 打开类型
        */
-      openAddModal(uid,type = 'update'){
-        if(uid==null || type==='update'){
-          if(this.roles==null){
-            this.getRoleList();
-          }
-        }
-        if(uid==null){
-          this.addUserModal = true;
-        }else if(type==='update'){
-          this.updateUserId = uid;
-          this.updateUserModal = true;
-        }else{
-          this.resetPasswordUser = uid;
-          this.resetPasswordModal = true;
-        }
+      updateModel (index) {
+        this.modal.data = this.data.list[index]
+        this.modal.data.orderStatus = this.modal.data.orderStatus + ''
+        this.modal.data.orderinfoStatus = this.modal.data.orderinfoStatus + ''
+        this.modal.data.createTime = dayjs(this.modal.data.createTime ).format('YYYY年MM月DD日 HH:mm:ss')
+        this.modal.data.arriveTime = dayjs(  this.modal.data.arriveTime).format('YYYY年MM月DD日 HH:mm:ss')
+        this.modal.show = true
       },
       /**
        * @description 关闭模态窗口
@@ -267,6 +308,21 @@
             break
         }
         if (reload) this.getData()
+      },
+       async ok () {
+        try {
+          let res = await post(this.$url.getUpdateOrderInfo, this.modal.data)
+        debugger
+          this.data = res.data
+        } catch (error) {
+          this.$throw(error)
+        }
+
+
+
+      },
+      cancel(){
+        this.modal.show=false
       },
       /**
        * @description 导出表格CSV

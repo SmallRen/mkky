@@ -32,7 +32,7 @@
     </Row>
     <Modal v-model="modal.show" title="属性"
            :mask-closable="false" :closable="false" :width="800">
-      <Form ref="modalForm" :model="modal.data" :label-width="70">
+      <Form ref="modalForm" :model="modal.data" :label-width="70" :rules="rules">
 
         <FormItem label="图片地址" prop="rotationImg">
           <Input v-model.trim="modal.data.rotationImg"></Input>
@@ -94,8 +94,19 @@
         },
         isClear: false,
 
-        img: []
+        img: [],
+        rules:{
+          rotationImg: [
+            { required: true, message: "图片地址不能为空" },
+          ],
+          rotationConnet: [
+            { required: true, message: "不能为空" },
+          ],
+          rotationState: [
+            { required: true, message: "不能为空" },
+          ],
 
+        }
       }
     },
     created() {

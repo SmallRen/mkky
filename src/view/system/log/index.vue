@@ -75,7 +75,7 @@
                         title: '创建日期',
                         key: 'createDate',
                         render:(h,params)=>{
-                            return h('span',dayjs(params.row.createDate).format('YYYY年MM月DD日 HH:mm:ss'))
+                            return h('span',dayjs(params.row.createDate*1000).format('YYYY年MM月DD日 HH:mm:ss'))
                         },
                         sortable: true
                     },

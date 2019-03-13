@@ -10,7 +10,7 @@ import qs from 'qs'
 const baseRequestUrl = process.env.NODE_ENV === 'development' ? config.baseUrl.dev : config.baseUrl.pro
 const axiosInstance = axios.create({
   baseURL: baseRequestUrl,
-  timeout: 3000
+  timeout: 300000
   // withCredentials: true
 
 })

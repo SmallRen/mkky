@@ -41,7 +41,7 @@
     </Card>
     <Modal v-model="modal.show" title="属性"
            :mask-closable="false" :closable="false" :width="800">
-      <Form ref="modalForm" :model="modal" :label-width="80"  >
+      <Form ref="modalForm" :model="modal" :label-width="80">
         <FormItem label="标题" prop="courseExplain">
           <Input v-model.trim="modal.data.courseExplain"></Input>
         </FormItem>
@@ -51,15 +51,12 @@
         <FormItem label="内容" prop="courseContent">
           <Editor v-model="modal.data.courseContent" :isClear="editor.isClear" @change="change"></Editor>
         </FormItem>
-        <FormItem label="资讯时间" prop="contentTime">
-          <Input v-model="modal.data.contentTime" :isClear="editor.isClear" @change="change"></Input>
-        </FormItem>
 
 
-        <FormItem label="资讯状态" prop="contentState">
+        <FormItem label="内容状态" prop="contentState">
           <RadioGroup v-model="modal.data.contentState">
-            <Radio label="0">上架</Radio>
-            <Radio label="1">下架</Radio>
+            <Radio label="0">正常</Radio>
+            <Radio label="1">有问题</Radio>
           </RadioGroup>
         </FormItem>
       </Form>
@@ -70,7 +67,7 @@
     </Modal>
     <Modal v-model="modal2.show" title="属性"
            :mask-closable="false" :closable="false" :width="800">
-      <Form ref="modalForm2" :model="modal2" :label-width="80"   >
+      <Form ref="modalForm2" :model="modal2" :label-width="80">
         <FormItem label="标题" prop="courseExplain">
           <Input v-model.trim="modal2.data.courseExplain"></Input>
         </FormItem>
@@ -112,7 +109,7 @@
   export default {
     data () {
       return {
-        selections:[],
+        selections: [],
         updateIndex: '',
         typeOperation: '',
         removeModal: {
@@ -130,8 +127,8 @@
             courseExplain: '',
             courseImg: '',
             contentTime: '',
-            contentState:  '0',
-            courseContent:''
+            contentState: '0',
+            courseContent: ''
           },
           addRules: {
             courseExplain: [{ required: true, message: '标题不能为空' }],
@@ -171,29 +168,26 @@
           },
           { title: '教程ID', key: 'courseId', sortable: true, align: 'center', width: 300, },
           { title: '教程标题', key: 'courseExplain', sortable: true, align: 'center', width: 180, },
-          { title: '封面图', key: 'courseImg', sortable: true, align: 'center',   },
-           {
+          { title: '封面图', key: 'courseImg', sortable: true, align: 'center', },
+          {
             title: '发布时间',
             key: 'contentTime', width: 180,
             render: (h, params) => {
-              return h('span', dayjs(params.row.contentTime).format('YYYY年MM月DD日 HH:mm:ss'))
+              return h('span', dayjs(params.row.contentTime * 1000).format('YYYY年MM月DD日 HH:mm:ss'))
             },
 
             sortable: true
           },
           {
-            title: '状态',
+            title: '内容状态',
             key: 'action',
             width: 160,
             align: 'center',
             render: (h, params) => {
               if (params.row.contentState == 0) {
-                return h('Tag', { props: { color: 'primary' } }, '普通用户')
-              } else if (params.row.contentState == 1){
-                return h('Tag', { props: { color: 'warning' } }, '管理员')
-              }
-              else{
-                return h('Tag', { props: { color: 'success' } }, '超级管理员')
+                return h('Tag', { props: { color: 'primary' } }, "正常")
+              } else if (params.row.contentState == 1) {
+                return h('Tag', { props: { color: 'warning' } }, '有问题')
               }
 
             },
@@ -331,7 +325,6 @@
             page: this.dataFilter.page,
             rows: this.dataFilter.pageSize
           })
-          debugger
           this.data = res.data
         } catch (error) {
           this.$throw(error)
@@ -350,11 +343,12 @@
        * @param type 打开类型
        */
       modalUpdate (index) {
+        this.updateIndex=index
         let temp1 = this.data.list[index]
         let obj = JSON.parse(JSON.stringify(temp1))
         this.modal.data = obj
         this.modal.data.contentState = this.modal.data.contentState + ''
-        this.modal.data.contentTime = dayjs(this.modal.data.contentTime).format('YYYY年MM月DD日 HH:mm:ss')
+        delete obj['contentTime']
         this.modal.show = true
       },
       /**
@@ -412,8 +406,9 @@
           if (valid) {
             this.modal.loading = true
             let url = ''
-            url = this.$url.informationUpdate
+            url = this.$url.getUpdateCourse
             this.modal.loading = true
+            let a=this.modal.data;
             this.update(url)
           }
         })
@@ -423,7 +418,7 @@
             if (valid) {
               this.modal2.loading = true
               let url = ''
-              url = this.$url.informationAdd
+              url = this.$url.getAddCourse
               this.modal2.loading = true
               this.add(url)
 
@@ -453,8 +448,9 @@
       },
       async update (url) {
         try {
-          let res = await put(url, this.modal.data)
+          let res = await post(url, this.modal.data)
           if (res.status === 1) {
+            this.data.list[this.updateIndex].contentState = this.modal.data.contentState
             this.modal.loading = false
             this.$Message.success('操作成功')
             let data = JSON.parse(JSON.stringify(this.modal.data))
@@ -464,10 +460,11 @@
           }
         } catch (error) {
           this.$throw(error)
-          this.modal.loading = false
-          this.modal.show = false
 
         }
+        this.modal.loading = false
+        this.modal.show = false
+
       }
       ,
       /**
@@ -480,8 +477,9 @@
       async delete () {
         this.removeModal.loading = true
         try {
-          let res = await get(this.$url.getDeleteCourse, { course_id: this.data.list[this.removeObject.index].course_id })
+          let res = await get(this.$url.getDeleteCourse, { course_id: this.data.list[this.removeObject.index].courseId })
           console.log(res)
+          debugger
           if (res.status === 1) {
             this.modal.loading = false
             this.data.list.splice(this.removeObject.index, 1)

@@ -22,7 +22,7 @@ const informationUpdate = '/cms/information/update'
 //删除订单
 const getDeleteOrderInfo = '/cms/Orderinfo/getDeleteOrderInfo'
 //更新订单
-const getUpdateOrderInfo = '/cms/Orderinfo/getUpdateOrderInfo'
+const getUpdateOrderInfo = '/cms/Orderinfo/getUpdateOrderinfo'
 //获取订单
 const getOrderInfo = '/cms/Orderinfo/getOrderinfo'
 //查询转账

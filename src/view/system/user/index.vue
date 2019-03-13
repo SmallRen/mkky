@@ -125,7 +125,7 @@
             title: '注册日期',
             key: 'userTime',
             render: (h, params) => {
-              return h('span', dayjs(params.row.userTime).format('YYYY年MM月DD日 HH:mm:ss'))
+              return h('span', dayjs(params.row.userTime*1000).format('YYYY年MM月DD日 HH:mm:ss'))
             },
             sortable: true
           },

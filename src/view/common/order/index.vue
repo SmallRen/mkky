@@ -44,16 +44,11 @@
           <Input v-model.trim="modal.data.machineId"></Input>
         </FormItem>
         <FormItem label="订单描述" prop="orderDescription">
-          <Input v-model.trim="modal.data.orderDescription"></Input>
+          <Select v-model="modal.data.orderDescription" style="width:200px">
+            <Option v-for="item in currencyList" :value="item.currencyName" :key="item.currencyName">{{ item.currencyName }}</Option>
+          </Select>
         </FormItem>
-        <FormItem label="创建时间" prop="createTime">
-          <DatePicker type="datetime" format="yyyy-MM-dd HH:mm:ss" v-model="modal.data.createTime" placeholder=""
-                      style="width: 200px"></DatePicker>
-        </FormItem>
-        <FormItem label="完成时间" prop="arriveTime">
-          <DatePicker type="datetime" format="yyyy-MM-dd HH:mm:ss" v-model="modal.data.arriveTime" placeholder=""
-                      style="width: 200px"></DatePicker>
-        </FormItem>
+
 
         <FormItem label="订单状态" prop="orderStatus">
           <RadioGroup v-model="modal.data.orderStatus">
@@ -106,14 +101,14 @@
           loading: true,
           showBorder: true
         },
+        currencyList: {},
         modal: {
           show: false,
           data: {
+            currencyId: '',
             orderId: '',
             userId: '',
             machineId: '',
-            createTime: '',
-            arriveTime: '',
             orderStatus: '',
             orderinfoStatus: '',
             orderDescription: '',
@@ -139,7 +134,7 @@
             title: '完成时间',
             key: 'arriveTime',
             render: (h, params) => {
-              return h('span', dayjs(params.row.arriveTime).format('YYYY年MM月DD日 HH:mm:ss'))
+              return h('span', dayjs(params.row.arriveTime * 1000).format('YYYY年MM月DD日 HH:mm:ss'))
             },
 
             sortable: true
@@ -148,7 +143,7 @@
             title: '创建日期',
             key: 'createTime',
             render: (h, params) => {
-              return h('span', dayjs(params.row.createTime).format('YYYY年MM月DD日 HH:mm:ss'))
+              return h('span', dayjs(params.row.createTime * 1000).format('YYYY年MM月DD日 HH:mm:ss'))
             },
             sortable: true
           },
@@ -212,8 +207,21 @@
     components: {},
     created () {
       this.getData()
+      this.getCurrencyList()
+
     },
     methods: {
+      async getCurrencyList () {
+        try {
+          let res = await get(this.$url.currencyList, {
+            page: this.dataFilter.page,
+            limit: 100,
+          })
+          this.currencyList = res.data.list
+        } catch (error) {
+          this.$throw(error)
+        }
+      },
       /**
        * @description 批量选择回调
        */
@@ -264,7 +272,6 @@
             status: 0,
             number: 1
           })
-          debugger
           this.data = res.data
         } catch (error) {
           this.$throw(error)
@@ -280,8 +287,8 @@
         this.modal.data = this.data.list[index]
         this.modal.data.orderStatus = this.modal.data.orderStatus + ''
         this.modal.data.orderinfoStatus = this.modal.data.orderinfoStatus + ''
-        this.modal.data.createTime = dayjs(this.modal.data.createTime ).format('YYYY年MM月DD日 HH:mm:ss')
-        this.modal.data.arriveTime = dayjs(  this.modal.data.arriveTime).format('YYYY年MM月DD日 HH:mm:ss')
+        delete this.modal.data['createTime']
+        delete this.modal.data['arriveTime']
         this.modal.show = true
       },
       /**
@@ -309,20 +316,21 @@
         }
         if (reload) this.getData()
       },
-       async ok () {
+      async ok () {
         try {
           let res = await post(this.$url.getUpdateOrderInfo, this.modal.data)
-        debugger
           this.data = res.data
+          if(res.status===1){
+            this.$Message.success('操作成功！')
+            this.getData()
+          }
         } catch (error) {
           this.$throw(error)
         }
-
-
-
+        this.modal.show = false
       },
-      cancel(){
-        this.modal.show=false
+      cancel () {
+        this.modal.show = false
       },
       /**
        * @description 导出表格CSV

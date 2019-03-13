@@ -34,7 +34,7 @@
         </template>
       </div>
     </Card>
-    <Modal v-model="updateModal" width="360">
+    <Modal v-model="updateModal.show" width="360">
       <p slot="header" style="color:green;text-align:center">
         <Icon type="information-circled"></Icon>
         <span>提示</span>
@@ -43,7 +43,7 @@
         <p>此操作为不可逆操作，是否确认完成？</p>
       </div>
       <div slot="footer">
-        <Button type="success" size="large" long :loading="setting.loading" @click="handleFinish">确认处理完成</Button>
+        <Button type="success" size="large" long :loading="updateModal.setting.loading" @click="handleFinish">确认处理完成</Button>
       </div>
     </Modal>
 
@@ -59,10 +59,16 @@
       return {
         updateIndex: '',
         selections: [],
-        updateModal: false,
+        updateModal:{
+          show:false,
+          setting: {
+            loading: false,
+            showBorder: false
+          },
+        },
         setting: {
-          loading: true,
-          showBorder: true
+          loading: false,
+          showBorder: false
         },
         search: {
           type: 'name',
@@ -83,7 +89,7 @@
             title: '提现时间',
             key: 'withdrawalTime',
             render: (h, params) => {
-              return h('span', dayjs(params.row.createDate).format('YYYY年MM月DD日 HH:mm:ss'))
+              return h('span', dayjs(params.row.withdrawalTime * 1000).format('YYYY年MM月DD日 HH:mm:ss'))
             },
             sortable: true
           }, {
@@ -178,25 +184,27 @@
       },
       updataStatus (index) {
         this.updateIndex = index
-        this.updateModal = true
+        this.updateModal.show = true
 
       },
       async handleFinish () {
         try {
-          let res = await put(this.$url.orderUpdate, {
+          let res = await post(this.$url.orderUpdate, {
             withdrawalId: this.data.list[this.updateIndex].withdrawalId,
-            withdrawalState: this.data.list[this.updateIndex].withdrawalState,
+            withdrawalState: 1,
           })
-          debugger
+
           if (res.status === 1) {
-            this.data.list.withdrawalState = 1
-            this.updateModal.loading = false
+            this.data.list[this.updateIndex].withdrawalState = 1
+            this.updateModal.setting.loading = false
+            this.updateModal.show = false
             this.$Message.success('操作成功')
           } else {
             this.$Message.error('操作失败')
           }
         } catch (error) {
           this.$throw(error)
+          this.$Message.error('操作失败')
         }
       },
       /**
@@ -210,7 +218,6 @@
             rows: this.dataFilter.pageSize
           })
           this.data = res.data
-          debugger
         } catch (error) {
           this.$throw(error)
         }

@@ -178,7 +178,7 @@
             title: '创建日期',
             key: 'informaTime', width: 180,
             render: (h, params) => {
-              return h('span', dayjs(params.row.informaTime).format('YYYY年MM月DD日 HH:mm:ss'))
+              return h('span', dayjs(params.row.informaTime*1000).format('YYYY年MM月DD日 HH:mm:ss'))
             },
 
             sortable: true
@@ -352,7 +352,7 @@
         let obj = JSON.parse(JSON.stringify(temp1))
         this.modal.data = obj
         this.modal.data.informaState = this.modal.data.informaState + ''
-        this.modal.data.informaTime = dayjs(this.modal.data.informaTime).format('YYYY年MM月DD日 HH:mm:ss')
+        this.modal.data.informaTime = dayjs(this.modal.data.informaTime*1000).format('YYYY年MM月DD日 HH:mm:ss')
         this.modal.show = true
       },
       /**

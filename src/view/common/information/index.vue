@@ -51,12 +51,6 @@
         <FormItem label="内容" prop="informaContent">
           <Editor v-model="modal.data.informaContent" :isClear="editor.isClear" @change="change"></Editor>
         </FormItem>
-        <FormItem label="资讯时间" prop="informaTime">
-
-          <DatePicker type="datetime" format="yyyy-MM-dd HH:mm" v-model="modal.data.informaTime"   placeholder="" style="width: 200px"></DatePicker>
-        </FormItem>
-
-
         <FormItem label="资讯状态" prop="informaState">
           <RadioGroup v-model="modal.data.informaState">
             <Radio label="0">上架</Radio>
@@ -137,7 +131,6 @@
             informaHeadline: '',
             informaContent: '',
             informa_img: '',
-            informaTime: '',
             informaState: '0'
           }
         },
@@ -179,7 +172,7 @@
             title: '创建日期',
             key: 'informaTime', width: 180,
             render: (h, params) => {
-              return h('span', dayjs(params.row.informaTime).format('YYYY年MM月DD日 HH:mm:ss'))
+              return h('span', dayjs(params.row.informaTime*1000).format('YYYY年MM月DD日 HH:mm:ss'))
             },
 
             sortable: true
@@ -351,9 +344,11 @@
       modalUpdate (index) {
         let temp1 = this.data.list[index]
         let obj = JSON.parse(JSON.stringify(temp1))
+        delete obj['informaTime']
         this.modal.data = obj
         this.modal.data.informaState = this.modal.data.informaState + ''
-        this.modal.data.informaTime = dayjs(this.modal.data.informaTime).format('YYYY年MM月DD日 HH:mm:ss')
+
+      debugger
         this.modal.show = true
       },
       /**
@@ -453,22 +448,22 @@
       },
       async update (url) {
         try {
-          let res = await put(url, this.modal.data)
+          let res = await post(url, this.modal.data)
 
           if (res.status === 1) {
             this.modal.loading = false
             this.$Message.success('操作成功')
-            let data = JSON.parse(JSON.stringify(this.modal.data))
-            this.data.list.push(data)
+            this.getData()
           } else {
             this.$Message.error('操作失败')
           }
         } catch (error) {
           this.$throw(error)
-          this.modal.loading = false
-          this.modal.show = false
 
-        }
+
+        } this.modal.loading = false
+        this.modal.show = false
+
       }
       ,
       /**

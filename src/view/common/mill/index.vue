@@ -168,8 +168,22 @@
           this.$Message.warning('删除对象为空，无法继续执行！')
           return false
         }
+
+
         this.setting.loading = true
-        this.data.records.splice(this.removeObject.index, 1)
+
+        try {
+          let res = await get(this.$url.deleteMiningMachine, { basic_id:this.data.list[ this.removeObject.index].machineId})
+          if (res.status === 1) {
+            this.$Message.success('操作成功！')
+            this.data.list.splice(this.removeObject.index, 1)
+          } else {
+            this.$Message.error('操作失败')
+          }
+        } catch (error) {
+          this.$throw(error)
+        }
+
         this.setting.loading = false
       },
 

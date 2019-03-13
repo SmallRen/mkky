@@ -85,7 +85,7 @@
             title: '创建日期',
             key: 'feedback_Time', width: 180,
             render: (h, params) => {
-              return h('span', dayjs(params.row.feedback_Time).format('YYYY年MM月DD日 HH:mm:ss'))
+              return h('span', dayjs(params.row.feedback_Time*1000).format('YYYY年MM月DD日 HH:mm:ss'))
             },
 
             sortable: true

@@ -242,7 +242,7 @@
             title: '入库时间',
             key: 'computerTime',
             render: (h, params) => {
-              return h('span', dayjs(params.row.createDate).format('YYYY年MM月DD日 HH:mm:ss'))
+              return h('span', dayjs(params.row.createDate*1000).format('YYYY年MM月DD日 HH:mm:ss'))
             },
             sortable: true
           },
@@ -362,7 +362,7 @@
       },
       updateModal (index) {
         this.modal.data = this.data[index]
-        this.modal.data.computerTime = dayjs(this.modal.data.computerTime ).format('YYYY年MM月DD日 HH:mm:ss')
+        this.modal.data.computerTime = dayjs(this.modal.data.computerTime *1000).format('YYYY年MM月DD日 HH:mm:ss')
         this.modal.show = true
       },
       async deleteBasic () {

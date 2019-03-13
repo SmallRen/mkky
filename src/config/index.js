@@ -14,6 +14,6 @@ export default {
    */
   baseUrl: {
     dev: 'http://39.98.200.255:8098/cms',
-    pro: 'http://localhost:80'
+    pro: 'http://39.98.200.255:8098/cms'
   }
 }

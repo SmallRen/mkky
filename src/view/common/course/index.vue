@@ -3,7 +3,7 @@
     <Card>
       <p slot="title" class="card-title">
         <Icon type="home"></Icon>
-        <span>资讯管理</span>
+        <span>教程管理</span>
       </p>
       <div>
         <template>

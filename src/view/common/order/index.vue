@@ -16,7 +16,12 @@
               <Button type="primary" @click="exportData(1)">
                 <Icon type="ios-download-outline"></Icon>&nbsp;导出表格
               </Button>
-
+              <Button type="warning" @click="orderStatus(0)">
+                <Icon type="md-albums"></Icon>&nbsp;待审核
+              </Button>
+              <Button type="success" @click="orderStatus(1)">
+                <Icon type="md-checkmark"></Icon>&nbsp;已完成
+              </Button>
             </Col>
             <Col span="9">
               <Input v-model="search.value" placeholder="请输入您想要搜索的内容..." @click="find()" class="margin-bottom-10">
@@ -45,14 +50,16 @@
         </FormItem>
         <FormItem label="订单描述" prop="orderDescription">
           <Select v-model="modal.data.orderDescription" style="width:200px">
-            <Option v-for="item in currencyList" :value="item.currencyName" :key="item.currencyName">{{ item.currencyName }}</Option>
+            <Option v-for="item in currencyList" :value="item.currencyName" :key="item.currencyName">{{
+              item.currencyName }}
+            </Option>
           </Select>
         </FormItem>
 
 
         <FormItem label="订单状态" prop="orderStatus">
           <RadioGroup v-model="modal.data.orderStatus">
-            <Radio label="0">进行中</Radio>
+            <Radio label="0">待审核</Radio>
             <Radio label="1">以完成</Radio>
           </RadioGroup>
         </FormItem>
@@ -127,18 +134,8 @@
           { title: '订单ID', key: 'orderId', sortable: true },
           { title: '用户ID', key: 'userId', sortable: true },
           { title: '矿机Id', key: 'machineId', sortable: true },
-          { title: '矿机账号', key: 'age', sortable: true },
-          { title: '矿机密码', key: 'age', sortable: true },
-          { title: 'MAC地址', key: 'age', sortable: true },
-          {
-            title: '完成时间',
-            key: 'arriveTime',
-            render: (h, params) => {
-              return h('span', dayjs(params.row.arriveTime * 1000).format('YYYY年MM月DD日 HH:mm:ss'))
-            },
+          { title: '类型', key: 'orderDescription', sortable: true },
 
-            sortable: true
-          },
           {
             title: '创建日期',
             key: 'createTime',
@@ -154,14 +151,22 @@
             align: 'center',
             render: (h, params) => {
               if (params.row.orderStatus == 0) {
-                return h('Tag', { props: { color: 'blue' } }, '进行中')
+                return h('Tag', { props: { color: 'warning' } }, '待审核')
               } else {
-                return h('Tag', { props: { color: 'red' } }, '以完成')
+                return h('Tag', { props: { color: 'success' } }, '已完成')
               }
 
             },
           },
+          {
+            title: '完成时间',
+            key: 'arriveTime',
+            render: (h, params) => {
+              return h('span', dayjs(params.row.arriveTime * 1000).format('YYYY年MM月DD日 HH:mm:ss'))
+            },
 
+            sortable: true
+          },
           {
             title: '操作',
             key: 'action',
@@ -201,16 +206,22 @@
           pageSize: 10
         },
         removeObject: null,
-        roles: null
+        roles: null,
+        order_status: '0'
       }
+
     },
     components: {},
     created () {
-      this.getData()
+      this.getData(this.order_status)
       this.getCurrencyList()
 
     },
     methods: {
+      orderStatus (status) {
+        this.order_status = status
+        this.getData(status)
+      },
       async getCurrencyList () {
         try {
           let res = await get(this.$url.currencyList, {
@@ -233,14 +244,14 @@
        */
       pageChange (p) {
         this.dataFilter.page = p
-        this.getData()
+        this.getData(this.order_status)
       },
       /**
        * @description 分页每页显示数量改变事件回调
        */
       pageSizeChange (p) {
         this.dataFilter.pageSize = p
-        this.getData()
+        this.getData(this.order_status)
       },
 
       async find () {
@@ -263,15 +274,16 @@
       /**
        * @description 获取用户列表
        */
-      async getData () {
+      async getData (status) {
         this.setting.loading = true
         try {
           let res = await get(this.$url.getOrderInfo, {
             page: this.dataFilter.page,
             rows: this.dataFilter.pageSize,
-            status: 0,
+            status: status,
             number: 1
           })
+          debugger
           this.data = res.data
         } catch (error) {
           this.$throw(error)
@@ -320,9 +332,9 @@
         try {
           let res = await post(this.$url.getUpdateOrderInfo, this.modal.data)
           this.data = res.data
-          if(res.status===1){
+          if (res.status === 1) {
             this.$Message.success('操作成功！')
-            this.getData()
+            this.getData(0)
           }
         } catch (error) {
           this.$throw(error)

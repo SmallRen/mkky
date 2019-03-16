@@ -3,7 +3,7 @@
     <Card>
       <p slot="title" class="card-title">
         <Icon type="home"></Icon>
-        <span>资讯管理</span>
+        <span>币种管理</span>
       </p>
       <div>
         <template>
@@ -147,6 +147,24 @@
           },
           { title: '种类ID', key: 'currencyId', sortable: true, align: 'center', width: 300, },
           { title: '币种名称', key: 'currencyName', sortable: true, align: 'center', width: 180, },
+          { title: '币种价格', key: 'price', sortable: true, align: 'center', width: 180, },
+          {
+            title: '币种图片', key: 'currencyImg', width: 100,
+            render: (h, params) => {
+              return h('div', [
+                h('img', {
+                  style: {
+                    width: '40px',
+                    height:'40px',
+                    verticalAlign: 'middle'
+                  },
+                  attrs: {
+                    src: params.row.currencyImg
+                  }
+                },)])
+            },
+
+          },
           { title: '币种图片url', key: 'currencyImg', sortable: true, align: 'center',   },
           {
             title: '状态',

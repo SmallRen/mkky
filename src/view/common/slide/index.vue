@@ -20,10 +20,10 @@
                 <Button size="small" type="success">替换</Button>
                 <Button size="small" type="error" @click="deleteImg(index)">删除</Button>
               </div>
-              <br>
+             <!-- <br>
               <h2>资讯内容</h2>
               <Divider/>
-              <div class="c-div" slot="title" v-html="item.rotationConnet"></div>
+              <div class="c-div" slot="title" v-html="item.rotationConnet"></div>-->
             </div>
           </Card>
         </Col>

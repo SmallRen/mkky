@@ -25,12 +25,16 @@ const getDeleteOrderInfo = '/cms/Orderinfo/getDeleteOrderInfo'
 const getUpdateOrderInfo = '/cms/Orderinfo/getUpdateOrderinfo'
 //获取订单
 const getOrderInfo = '/cms/Orderinfo/getOrderinfo'
-//查询转账
+//********************************************查询转账
 const WithdrawalOrderByKey = '/cms/withdrawalOrder/WithdrawalOrderByKey'
 //修改
 const orderUpdate = '/cms/withdrawalOrder/update'
 //查询用户提现
 const getOrderList = '/cms/withdrawalOrder/list'
+
+const WithdrawalOrderBylist='/cms/withdrawalOrder/WithdrawalOrderBylist'
+
+
 //******************************************矿机管理
 //所有矿机
 const listMiningMachine = '/cms/MiningMachine/listMiningMachine'
@@ -100,7 +104,7 @@ export default {
   //订单管理
   getDeleteOrderInfo, getUpdateOrderInfo, getOrderInfo,
   //转账管理
-  WithdrawalOrderByKey, orderUpdate, getOrderList,
+  WithdrawalOrderByKey, orderUpdate, getOrderList,WithdrawalOrderBylist,
   //矿机管理
   listMiningMachine, KeyListMiningMachine, updateMiningMachine, deleteMiningMachine, insertMiningMachine,
   //模板管理

@@ -3,7 +3,7 @@
     <Card>
       <p slot="title" class="card-title">
         <Icon type="home"></Icon>
-        <span>钱包管理</span>
+        <span>转账管理</span>
       </p>
       <div>
         <template>
@@ -16,6 +16,17 @@
               <Button type="primary" @click="exportData(1)">
                 <Icon type="ios-download-outline"></Icon>&nbsp;导出表格
               </Button>
+              <Button :disabled="setting.loading" type="warning" @click="getOrderStatus('0')">
+                <Icon type="md-color-filter" />&nbsp;待审核
+              </Button>
+              <Button :disabled="setting.loading" type="success" @click="getOrderStatus('1')">
+                <Icon type="md-checkmark" />已完成
+              </Button>
+              <Button :disabled="setting.loading" type="error" @click="getOrderStatus('2')">
+                <Icon type="md-close" />&nbsp;提现失败
+              </Button>
+
+
 
             </Col>
             <Col span="9">
@@ -160,6 +171,19 @@
       pageSizeChange (p) {
         this.dataFilter.pageSize = p
         this.getData()
+      },
+
+      async getOrderStatus(status){
+        try {
+          let res = await get(this.$url.WithdrawalOrderBylist, {
+            page: this.dataFilter.page,
+            rows: this.dataFilter.pageSize,
+            withdrawal_state:status
+          })
+          this.data = res.data
+        } catch (error) {
+          this.$throw(error)
+        }
       },
       async find () {
 

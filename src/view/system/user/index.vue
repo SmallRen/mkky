@@ -41,30 +41,21 @@
         <span>提示</span>
       </p>
       <div style="text-align:center">
-        <p>此操作为不可逆操作，是否确认删除？</p>
+        <p>此操作为不可逆操作，是否确认操作？</p>
       </div>
       <div slot="footer">
-        <Button type="error" size="large" long :loading="setting.loading" @click="removeUser">确认删除</Button>
+        <Button type="error" size="large" long :loading="setting.loading" @click="ok">确认操作</Button>
       </div>
     </Modal>
-    <AddUser v-if="addUserModal" :roles="roles" @cancel="onModalCancel"/>
-    <UpdateUser v-if="updateUserModal" :roles="roles" :uid="updateUserId" @cancel="onModalCancel"/>
-    <ResetPassword v-if="resetPasswordModal" :user="resetPasswordUser" @cancel="onModalCancel"/>
   </div>
 </template>
 <script>
   import dayjs from 'dayjs'
-  import { post, get } from '@/libs/axios-cfg'
-  import AddUser from './components/add.vue'
-  import UpdateUser from './components/update.vue'
-  import ResetPassword from './components/reset-password.vue'
+  import { post, get,put } from '@/libs/axios-cfg'
 
   export default {
     data () {
       return {
-        addUserModal: false,
-        updateUserModal: false,
-        resetPasswordModal: false,
         updateUserId: null,
         resetPasswordUser: null,
         selections: [],
@@ -84,14 +75,15 @@
             align: 'center'
           },
           { title: '用户id', key: 'userId', sortable: true },
-          { title: '用户名', key: 'userName', sortable: true },
+          { title: '真实名字', key: 'userRealName', width: 100, align: 'center' },
           {
-            title: '用户头像', key: 'userImg', sortable: true,
+            title: '头像', key: 'userImg', width: 100,
             render: (h, params) => {
               return h('div', [
                 h('img', {
                   style: {
-                    width: '30px',
+                    width: '40px',
+                    height:'40px',
                     verticalAlign: 'middle'
                   },
                   attrs: {
@@ -101,38 +93,40 @@
             },
 
           },
-          { title: '用户电话', key: 'userPhone', sortable: true },
-          { title: '用户密码', key: 'userWord', sortable: true },
-          { title: '用户状态', key: 'userState', sortable: true },
-          { title: '注册时间', key: 'userTime', sortable: true },
-          { title: '用户算力', key: 'userCount', sortable: true },
-          { title: '状态（前后是否显示）', key: 'state', sortable: true },
-
-          {
-            title: '状态',
-            key: 'userState',
-            render: (h, params) => {
-              return h('span',
-                {
-                  style: {
-                    color: params.row.status == 1 ? 'green' : 'red'
-                  }
-                }, params.row.status == 1 ? '正常' : '锁定中')
-            },
-            sortable: true
-          },
+          { title: '用户电话', key: 'userPhone', sortable: true, width: 120 },
+          { title: '身份证', key: 'idNumber', sortable: true, width: 160, align: 'center' },
+          { title: '邮箱', key: 'userEmail', sortable: true, width: 180, align: 'center' },
           {
             title: '注册日期',
             key: 'userTime',
+            width: 180,
             render: (h, params) => {
-              return h('span', dayjs(params.row.userTime*1000).format('YYYY年MM月DD日 HH:mm:ss'))
+              return h('span', dayjs(params.row.userTime).format('YYYY年MM月DD日 HH:mm:ss'))
+            },
+            sortable: true
+          },
+          { title: '用户算力', key: 'userCount', sortable: true, width: 110, align: 'center' },
+          { title: '分瓜标识', key: 'partitionIdentification', sortable: true, width: 110, align: 'center' },
+          {
+            title: '托管状态',
+            key: 'trusteeship',
+            width: 120,
+            align: 'center',
+            render: (h, params) => {
+              return h('tag',
+                {
+                  props: {
+                    color: params.row.status == 1 ? 'warning' : 'success'
+                  }
+                }, params.row.status == 1 ? '未托管' : '已托管')
             },
             sortable: true
           },
           {
             title: '操作',
             key: 'action',
-            width: 160,
+            width: 100,
+            sortable: true,
             align: 'center',
             render: (h, params) => {
               return h('div', [
@@ -144,7 +138,7 @@
                       this.lockUser(params.row)
                     }
                   }
-                }, params.row.state == 1? '冻结' : '恢复'),
+                }, params.row.state == 1 ? '冻结' : '恢复'),
               ])
             }
           }
@@ -158,9 +152,7 @@
         roles: null
       }
     },
-    components: {
-      AddUser, UpdateUser, ResetPassword
-    },
+    components: {},
     created () {
       this.getData()
     },
@@ -218,47 +210,29 @@
       },
 
       /**
-       * @description 删除用户
+       * @description 修改状态
        */
-      async removeUser () {
-        this.removeModal = false
-        if (this.removeObject == null) {
-          this.$Message.warning('删除对象为空，无法继续执行！')
-          return false
-        }
+      async ok () {
+        let status = this.removeObject.state === 0 ? 1 : 0
         this.setting.loading = true
         try {
-          let res = await post('/system/user/remove/{uid}', null, {
-            uid: this.removeObject.obj.id
-          })
-          this.$Message.success('删除成功')
-          this.data.records.splice(this.removeObject.index, 1)
+          let res = await post(this.$url.update, { state: status, userId: this.removeObject.userId })
+          this.$Message.success('操作成功！')
+
+          this.getData()
         } catch (error) {
           this.$throw(error)
         }
         this.setting.loading = false
+        this.removeModal = false
       },
       /**
        * @description 锁定/解锁用户
        */
       async lockUser (obj) {
-        this.setting.loading = true
-        let status = obj.status
-        let req_url = status == 1 ? 'lock' : 'unlock'
-        let req_rep = status == 1 ? 0 : 1
-        let req_msg = status == 1 ? '已锁定' : '已解锁'
-        try {
-          let res = await post('/system/user/{method}/{uid}', null, {
-            uid: obj.id,
-            method: req_url
-          })
-          this.$Message.destroy()
-          this.$Message.success(req_msg)
-          obj.status = req_rep
-        } catch (error) {
-          this.$throw(error)
-        }
-        this.setting.loading = false
+        this.removeObject = obj
+        debugger
+        this.removeModal = true
       },
       /**
        * @description 获取用户列表

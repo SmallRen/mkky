@@ -18,7 +18,9 @@
               <Button type="primary" @click="exportData(1)">
                 <Icon type="ios-download-outline"></Icon>&nbsp;导出表格
               </Button>
-
+              <Button type="info" onClick="Javascript:location.href='/common/mill-template'">
+                <Icon type="md-add"></Icon>&nbsp;添加矿机模板
+              </Button>
             </Col>
             <Col span="9">
               <Input v-model="search.value" placeholder="请输入您想要搜索的内容..." @click="find()" class="margin-bottom-10">

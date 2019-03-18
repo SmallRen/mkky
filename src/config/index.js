@@ -13,7 +13,7 @@ export default {
    * @description api请求基础路径
    */
   baseUrl: {
-    dev: 'http://127.0.0.1:8098/cms',
+    dev: 'http://39.98.200.255:8098/cms',
     pro: 'http://39.98.200.255:8098/cms'
   }
 }

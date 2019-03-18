@@ -416,7 +416,7 @@
       },
       async add (url) {
         try {
-          let res = await put(url, this.modal2.data)
+          let res = await post(url, this.modal2.data)
           debugger
           console.log(res)
           if (res.status === 1) {
@@ -435,8 +435,7 @@
       },
       async update (url) {
         try {
-          let res = await put(url, this.modal.data)
-          debugger
+          let res = await get(url, this.modal.data)
           if (res.status === 1) {
             this.modal.loading = false
             this.$Message.success('操作成功')

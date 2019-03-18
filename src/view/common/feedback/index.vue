@@ -83,7 +83,7 @@
           { title: '资讯图片url', key: 'feedback_comment', sortable: true, align: 'center', },
           {
             title: '创建日期',
-            key: 'feedback_Time', width: 180,
+            key: 'feedback_Time', width: 200,
             render: (h, params) => {
               return h('span', dayjs(params.row.feedback_Time*1000).format('YYYY年MM月DD日 HH:mm:ss'))
             },
@@ -194,7 +194,6 @@
           console.log(res)
           debugger
           if (res.status === 1) {
-            this.modal.loading = false
             this.data.list.splice(this.removeObject.index, 1)
             this.$Message.success('删除成功！')
             this.removeModal.show = false

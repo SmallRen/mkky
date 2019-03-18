@@ -149,12 +149,12 @@
               <Input v-model.trim="modal.data.powerSupply"></Input>
             </FormItem>
           </Col>
-          <Col span="12">
+          <!--<Col span="12">
             <FormItem label="入库时间" prop="computerTime">
               <DatePicker :value="modal.data.computerTime" format="yyyy-MM-dd HH:mm:ss" type="datetime" placeholder="选择日期"
                           style="width: 200px"></DatePicker>
             </FormItem>
-          </Col>
+          </Col>-->
         </row>
 
 
@@ -183,13 +183,13 @@
 </template>
 <script>
   import dayjs from 'dayjs'
-  import { post, get } from '@/libs/axios-cfg'
+  import {post, get} from '@/libs/axios-cfg'
 
   export default {
-    data () {
+    data() {
       return {
         modal: {
-          loading:false,
+          loading: false,
           show: false,
           data: {
             basicId: '',
@@ -232,17 +232,17 @@
             width: 60,
             align: 'center'
           },
-          { title: '模板ID', key: 'basicId', sortable: true },
-          { title: '矿机类型', key: 'basicName', sortable: true },
-          { title: '矿机封面图', key: 'basicImg', sortable: true },
-          { title: '矿机型号', key: 'nameOfMine', sortable: true },
-          { title: '网络类型', key: 'systemVersion', sortable: true },
-          { title: 'IP地址', key: 'ipAddress', sortable: true },
+          {title: '模板ID', key: 'basicId', sortable: true},
+          {title: '矿机类型', key: 'basicName', sortable: true},
+          {title: '矿机封面图', key: 'basicImg', sortable: true},
+          {title: '矿机型号', key: 'nameOfMine', sortable: true},
+          {title: '网络类型', key: 'systemVersion', sortable: true},
+          {title: 'IP地址', key: 'ipAddress', sortable: true},
           {
             title: '入库时间',
             key: 'computerTime',
             render: (h, params) => {
-              return h('span', dayjs(params.row.createDate*1000).format('YYYY年MM月DD日 HH:mm:ss'))
+              return h('span', dayjs(params.row.computerTime * 1000).format('YYYY年MM月DD日 HH:mm:ss'))
             },
             sortable: true
           },
@@ -254,8 +254,8 @@
             render: (h, params) => {
               return h('div', [
                 h('Button', {
-                  props: { type: 'primary', size: 'small' },
-                  style: { marginRight: '5px' },
+                  props: {type: 'primary', size: 'small'},
+                  style: {marginRight: '5px'},
                   on: {
                     click: () => {
                       this.updateModal(params.index)
@@ -264,7 +264,7 @@
                 }, '修改'),
 
                 h('Button', {
-                  props: { type: 'error', size: 'small' },
+                  props: {type: 'error', size: 'small'},
                   on: {
                     click: () => {
                       this.removeObject = {
@@ -289,31 +289,31 @@
       }
     },
     components: {},
-    created () {
+    created() {
       this.getData()
     },
     methods: {
       /**
        * @description 批量选择回调
        */
-      selectionChange (list) {
+      selectionChange(list) {
         this.selections = list
       },
       /**
        * @description 分页更换事件回调
        */
-      pageChange (p) {
+      pageChange(p) {
         this.dataFilter.page = p
         this.getData()
       },
       /**
        * @description 分页每页显示数量改变事件回调
        */
-      pageSizeChange (p) {
+      pageSizeChange(p) {
         this.dataFilter.pageSize = p
         this.getData()
       },
-      async find () {
+      async find() {
         if (this.search.value === '') {
           this.$Message.error('订单号不能为空')
           return
@@ -335,7 +335,7 @@
       /**
        * @description 删除用户
        */
-      removeBasic () {
+      removeBasic() {
         this.removeModal = false
         if (this.removeObject == null) {
           this.$Message.warning('删除对象为空，无法继续执行！')
@@ -343,29 +343,34 @@
         }
         this.deleteBasic()
       },
-      async ok () {
-        this.modal.loading=true
+      async ok() {
+        delete this.modal.data['computerTime']
+        this.modal.loading = true
         try {
           let res = await post(this.$url.updateMining, this.modal.data)
           if (res.status === 1) {
-            this.data.push(res.data)
-          } else if (res.data === null) {
-            this.$Message.error('未查到该订单')
+            this.getData()
+            this.$Message.success('操作成功！')
+          } else {
+            this.$Message.error('操作失败')
           }
         } catch (error) {
           this.$throw(error)
         }
-
-      },
-      cancel () {
+        this.modal.loading = false
         this.modal.show = false
       },
-      updateModal (index) {
-        this.modal.data = this.data[index]
-        this.modal.data.computerTime = dayjs(this.modal.data.computerTime *1000).format('YYYY年MM月DD日 HH:mm:ss')
+      cancel() {
+        this.modal.show = false
+      },
+      updateModal(index) {
+        let temp1 = this.data[index]
+        let obj = JSON.parse(JSON.stringify(temp1))
+        this.modal.data = obj
+        //this.modal.data.computerTime = dayjs(this.modal.data.computerTime *1000).format('YYYY年MM月DD日 HH:mm:ss')
         this.modal.show = true
       },
-      async deleteBasic () {
+      async deleteBasic() {
         this.setting.loading = true
         try {
           let res = await get(this.$url.deleteMining, {
@@ -385,7 +390,7 @@
       /**
        * @description 获取用户列表
        */
-      async getData () {
+      async getData() {
         this.setting.loading = true
         try {
           let res = await get(this.$url.MiningMachineBasicList, {
@@ -405,7 +410,7 @@
       /**
        * @description 导出表格CSV
        */
-      exportData (type) {
+      exportData(type) {
         if (type === 1) {
           this.$refs.table.exportCsv({
             filename: '用户数据-' + new Date().getTime(),

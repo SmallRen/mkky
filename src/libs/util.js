@@ -123,7 +123,7 @@ export const getNewTagList = (list, newRoute) => {
  * @param {*} route 路由列表
  */
 const hasAccess = (access, route) => {
-  debugger
+
   if (route.meta && route.meta.access) return hasOneOf(access, route.meta.access)
   else return true
 }
@@ -136,7 +136,7 @@ const hasAccess = (access, route) => {
  * @description 用户是否可跳转到该页
  */
 export const canTurnTo = (name, access, routes) => {
-  debugger
+
   const routePermissionJudge = (list) => {
     return list.some(item => {
       if (item.children && item.children.length) {

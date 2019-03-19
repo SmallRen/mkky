@@ -161,7 +161,7 @@
             page: this.dataFilter.page,
             rows: this.dataFilter.limit
           })
-          debugger
+
           this.data = res.data
         } catch (error) {
           this.$throw(error)
@@ -192,7 +192,7 @@
         try {
           let res = await del(this.$url.deleteUserFeedback, { feedbackId: this.data.list[this.removeObject.index].feedback_id })
           console.log(res)
-          debugger
+
           if (res.status === 1) {
             this.data.list.splice(this.removeObject.index, 1)
             this.$Message.success('删除成功！')

@@ -417,7 +417,7 @@
       async add (url) {
         try {
           let res = await post(url, this.modal2.data)
-          debugger
+
           console.log(res)
           if (res.status === 1) {
             this.modal2.loading = false
@@ -464,7 +464,7 @@
         try {
           let res = await del(this.$url.currencyDelete, { currencyId: this.data.list[this.removeObject.index].currencyId })
           console.log(res)
-          debugger
+
           if (res.status === 1) {
             this.modal.loading = false
             this.data.list.splice(this.removeObject.index, 1)

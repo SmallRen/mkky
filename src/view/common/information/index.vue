@@ -347,7 +347,7 @@
         this.modal.data = obj
         this.modal.data.informaState = this.modal.data.informaState + ''
 
-      debugger
+
         this.modal.show = true
       },
       /**
@@ -477,7 +477,7 @@
         try {
           let res = await del(this.$url.informationDelete, { informaId: this.data.list[this.removeObject.index].informaId })
           console.log(res)
-          debugger
+
           if (res.status === 1) {
             this.modal.loading = false
             this.data.list.splice(this.removeObject.index, 1)

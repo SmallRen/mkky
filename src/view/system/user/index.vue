@@ -231,7 +231,7 @@
        */
       async lockUser (obj) {
         this.removeObject = obj
-        debugger
+
         this.removeModal = true
       },
       /**
@@ -244,9 +244,9 @@
             page: this.dataFilter.page,
             rows: this.dataFilter.pageSize
           })
-          debugger
+
           if (res.status === 1) {
-            debugger
+
             this.data = res.data
           } else {
 

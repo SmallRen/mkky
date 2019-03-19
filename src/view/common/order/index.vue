@@ -283,7 +283,7 @@
             status: status,
             number: 1
           })
-          debugger
+
           this.data = res.data
         } catch (error) {
           this.$throw(error)

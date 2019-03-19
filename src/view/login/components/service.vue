@@ -94,17 +94,17 @@
           duration: 0
         })
         try {
-          debugger
+
           let res = await post(this.$url.login, {
             user_phone: this.formItem.account,
             user_word: this.formItem.password,
             state: this.formItem.state,
           })
-          debugger
+
           console.log(res)
           if (res.status == 1) {
             let data = qs.stringify(res.data.user);
-            debugger
+
             this.$Message.success('登录成功')
             localStorage.setItem('user', data)
             localStorage.setItem('state', this.formItem.state)

@@ -479,7 +479,7 @@
         try {
           let res = await get(this.$url.getDeleteCourse, { course_id: this.data.list[this.removeObject.index].courseId })
           console.log(res)
-          debugger
+
           if (res.status === 1) {
             this.modal.loading = false
             this.data.list.splice(this.removeObject.index, 1)

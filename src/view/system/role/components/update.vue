@@ -82,7 +82,7 @@ export default {
             let res = await post('/system/role/update/{id}',data,{
                 id:this.updateObject.id
             })
-          debugger
+
             this.$Message.success("角色 "+data.name+" 更新成功");
             this.cancel(true);
         } catch (error) {

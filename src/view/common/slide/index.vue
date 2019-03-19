@@ -142,7 +142,7 @@
             this.updateIndex = index
             let temp1 = this.img[index]
             let obj = JSON.parse(JSON.stringify(temp1))
-            debugger
+
             this.modal.data = obj
             this.modal.data.rotationState=this.modal.data.rotationState+""
           }
@@ -184,7 +184,7 @@
               if (this.typeOperation === 'update') {
                 url = this.$url.updateRotationChart
                 this.img[this.updateIndex] = this.modal.data
-                debugger
+
               } else {
                 url = this.$url.addRotationChart
               }

@@ -343,7 +343,7 @@
               url = this.$url.getUpdateSoftwareUpdates
             }
             this.modal.loading = true
-            debugger
+
             this.update(url)
           }
         })

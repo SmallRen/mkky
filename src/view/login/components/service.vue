@@ -19,11 +19,15 @@
                 </Input>
               </FormItem>
               <FormItem>
-                <RadioGroup v-model="this.formItem.state">
-                  <Radio label="0">普通用户</Radio>
-                  <Radio label="1">管理员</Radio>
-                  <Radio label="2">超级管理员</Radio>
-                </RadioGroup>
+                <Select v-model="formItem.state" style="width:200px">
+
+                  <Option value="1">超级管理员</Option>
+                  <Option value="2">宣传部</Option>
+                  <Option value="3">客服</Option>
+                  <Option value="4">财务</Option>
+                  <Option value="5">运维</Option>
+
+                </Select>
               </FormItem>
 
 
@@ -90,6 +94,7 @@
           duration: 0
         })
         try {
+          debugger
           let res = await post(this.$url.login, {
             user_phone: this.formItem.account,
             user_word: this.formItem.password,
@@ -99,8 +104,10 @@
           console.log(res)
           if (res.status == 1) {
             let data = qs.stringify(res.data.user);
+            debugger
             this.$Message.success('登录成功')
             localStorage.setItem('user', data)
+            localStorage.setItem('state', this.formItem.state)
             localStorage.setItem('token', res.data.tokenString)
             this.$store.commit('setToken', res.data.tokenString)
             this.$router.push({name: 'home'})

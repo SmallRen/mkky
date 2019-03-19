@@ -80,17 +80,18 @@ export default [
     component: Main,
     meta: {
       title: '公共设置',
-      icon:'ios-albums'
+      icon:'ios-albums',
+      access: ['common:common']
     },
     children:[
-      { path: 'slide',meta:{icon: 'md-people', title: '轮播图管理'}, name: 'slide', component: () => import('@/view/common/slide') },
-      { path: 'information',meta:{icon: 'md-jet', title: '资讯管理'}, name: 'information', component: () => import('@/view/common/information') },
-      { path: 'order',meta:{icon: 'md-body',title: '订单管理'}, name: 'order', component: () => import('@/view/common/order') },
-      { path: 'wallet',meta:{icon: 'ios-lock',title: '转账管理'}, name: 'wallet', component: () => import('@/view/common/wallet') },
-      { path: 'course',meta:{icon: 'md-outlet',title: '教程管理'}, name: 'course', component: () => import('@/view/common/course') },
-      { path: 'mill',meta:{icon: 'ios-grid',title: '矿机管理'}, name: 'mill', component: () => import('@/view/common/mill') },
-      { path: 'currency',meta:{icon: 'ios-aperture',title: '币种管理'}, name: 'currency', component: () => import('@/view/common/currency') },
-      { path: 'mill-template',meta:{icon: 'md-basket',title: '矿机模板'}, name: 'template', component: () => import('@/view/common/template') },
+      { path: 'slide',meta:{icon: 'md-people', title: '轮播图管理',access: ['common:slide']}, name: 'slide', component: () => import('@/view/common/slide') },
+      { path: 'information',meta:{icon: 'md-jet', title: '资讯管理',access: ['common:information']}, name: 'information', component: () => import('@/view/common/information') },
+      { path: 'order',meta:{icon: 'md-body',title: '订单管理',access: ['common:order']}, name: 'order', component: () => import('@/view/common/order') },
+      { path: 'wallet',meta:{icon: 'ios-lock',title: '转账管理',access: ['common:wallet']}, name: 'wallet', component: () => import('@/view/common/wallet') },
+      { path: 'course',meta:{icon: 'md-outlet',title: '教程管理',access: ['common:course']}, name: 'course', component: () => import('@/view/common/course') },
+      { path: 'mill',meta:{icon: 'ios-grid',title: '矿机管理',access: ['common:mill']}, name: 'mill', component: () => import('@/view/common/mill') },
+      { path: 'currency',meta:{icon: 'ios-aperture',title: '币种管理',access: ['common:currency']}, name: 'currency', component: () => import('@/view/common/currency') },
+      { path: 'mill-template',meta:{icon: 'md-basket',title: '矿机模板',access: ['common:template']}, name: 'template', component: () => import('@/view/common/template') },
       ]
   },
   {
@@ -99,11 +100,12 @@ export default [
     component: Main,
     meta: {
       title: 'APP管理',
-      icon:'ios-cog'
+      icon:'ios-cog',
+      access: ['common:app']
     },
     children:[
-      { path: 'update',meta:{icon: 'md-basket',title: 'app版本更新'}, name: 'update', component: () => import('@/view/common/update') },
-      { path: 'feedback',meta:{icon: 'md-microphone',title: 'app意见反馈'}, name: 'feedback', component: () => import('@/view/common/feedback') },
+      { path: 'update',meta:{icon: 'md-basket',title: 'app版本更新',access: ['common:update']}, name: 'update', component: () => import('@/view/common/update') },
+      { path: 'feedback',meta:{icon: 'md-microphone',title: 'app意见反馈',access: ['common:feedback']}, name: 'feedback', component: () => import('@/view/common/feedback') },
 
     ]
   },
@@ -113,11 +115,12 @@ export default [
     component: Main,
     meta: {
       title: '用户管理',
-      icon:'ios-cog'
+      icon:'ios-cog',
+      access: ['system']
     },
     children:[
-      { path: 'user',meta:{icon: 'md-people', title: '用户管理'}, name: 'system_user', component: () => import('@/view/system/user') },
-      { path: '#',meta:{icon: 'md-people', title: '用户结算'}, name: '', component: () => import('@/view/system/user') },
+      { path: 'user',meta:{icon: 'md-people', title: '用户管理',access: ['system:user']}, name: 'system_user', component: () => import('@/view/system/user') },
+      { path: '#',meta:{icon: 'md-people', title: '用户结算',access: ['system:xxxxx']}, name: '', component: () => import('@/view/system/user') },
     /*  { path: 'person-stalker',meta:{icon: 'md-body',title: '角色管理'}, name: 'system_role', component: () => import('@/view/system/role') },
       { path: 'resource',meta:{icon: 'ios-lock',title: '资源管理'}, name: 'system_resource', component: () => import('@/view/system/resource') },
       { path: 'log',meta:{icon: 'ios-aperture',title: '系统日志'}, name: 'system_log', component: () => import('@/view/system/log') },*/

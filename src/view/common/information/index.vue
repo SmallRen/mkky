@@ -165,9 +165,8 @@
             align: 'center'
           },
           { title: '资讯id', key: 'informaId', sortable: true, align: 'center', width: 300, },
-          { title: '资讯名称', key: 'informaHeadline', sortable: true, align: 'center', width: 180, },
-          { title: '资讯图片url', key: 'informa_img', sortable: true, align: 'center', width: 300, },
-          { title: '资讯内容', key: 'informa_img', sortable: true, align: 'center', },
+          { title: '资讯名称', key: 'informaHeadline', sortable: true, align: 'center' },
+          { title: '资讯图片url', key: 'informa_img', sortable: true, align: 'center'},
           {
             title: '创建日期',
             key: 'informaTime', width: 180,

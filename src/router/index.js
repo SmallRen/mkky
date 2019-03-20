@@ -35,7 +35,7 @@ router.beforeEach((to, from, next) => {
     store.dispatch('getUserInfo').then(user => {
       // 拉取用户信息，通过用户权限和跳转的页面的name来判断是否有权限访问;access必须是一个数组，如：['super_admin'] ['super_admin', 'admin']
 
-      debugger
+
       if (canTurnTo(to.name, user.access, routes)) next() // 有权限，可访问
 
 

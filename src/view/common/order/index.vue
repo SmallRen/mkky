@@ -48,7 +48,7 @@
         </FormItem>
         <FormItem label="订单描述" prop="orderDescription">
           <Select v-model="modal.data.orderDescription" style="width:200px">
-            <Option v-for="item in currencyList" :value="item.currencyName" >{{
+            <Option v-for="item in currencyList" :value="item.currencyName" :label="item.currencyName">{{
               item.currencyName }}
             </Option>
           </Select>
@@ -90,10 +90,10 @@
 </template>
 <script>
   import dayjs from 'dayjs'
-  import { post, get, del, put } from '@/libs/axios-cfg'
+  import {post, get, del, put} from '@/libs/axios-cfg'
 
   export default {
-    data () {
+    data() {
       return {
         addUserModal: false,
         updateUserModal: false,
@@ -129,10 +129,10 @@
             width: 60,
             align: 'center'
           },
-          { title: '订单ID', key: 'orderId', sortable: true },
-          { title: '用户名', key: 'userId', sortable: true },
-          { title: '矿机Id', key: 'machineId', sortable: true },
-          { title: '类型', key: 'orderDescription', sortable: true },
+          {title: '订单ID', key: 'orderId', sortable: true},
+          {title: '用户名', key: 'userId', sortable: true},
+          {title: '矿机Id', key: 'machineId', sortable: true},
+          {title: '类型', key: 'orderDescription', sortable: true},
 
           {
             title: '提交日期',
@@ -149,9 +149,9 @@
             align: 'center',
             render: (h, params) => {
               if (params.row.orderStatus == 0) {
-                return h('Tag', { props: { color: 'warning' } }, '待审核')
+                return h('Tag', {props: {color: 'warning'}}, '待审核')
               } else {
-                return h('Tag', { props: { color: 'success' } }, '已完成')
+                return h('Tag', {props: {color: 'success'}}, '已完成')
               }
 
             },
@@ -173,8 +173,8 @@
             render: (h, params) => {
               return h('div', [
                 h('Button', {
-                  props: { type: 'primary', size: 'small' },
-                  style: { marginRight: '5px' },
+                  props: {type: 'primary', size: 'small'},
+                  style: {marginRight: '5px'},
                   on: {
                     click: () => {
                       this.updateModel(params.index)
@@ -183,7 +183,7 @@
                 }, '修改'),
 
                 h('Button', {
-                  props: { type: 'error', size: 'small' },
+                  props: {type: 'error', size: 'small'},
                   on: {
                     click: () => {
                       this.removeObject = {
@@ -210,17 +210,17 @@
 
     },
     components: {},
-    created () {
+    created() {
       this.getData(this.order_status)
       this.getCurrencyList()
 
     },
     methods: {
-      orderStatus (status) {
+      orderStatus(status) {
         this.order_status = status
         this.getData(status)
       },
-      async getCurrencyList () {
+      async getCurrencyList() {
         try {
           let res = await get(this.$url.currencyList, {
             page: this.dataFilter.page,
@@ -234,31 +234,31 @@
       /**
        * @description 批量选择回调
        */
-      selectionChange (list) {
+      selectionChange(list) {
         this.selections = list
       },
       /**
        * @description 分页更换事件回调
        */
-      pageChange (p) {
+      pageChange(p) {
         this.dataFilter.page = p
         this.getData(this.order_status)
       },
       /**
        * @description 分页每页显示数量改变事件回调
        */
-      pageSizeChange (p) {
+      pageSizeChange(p) {
         this.dataFilter.pageSize = p
         this.getData(this.order_status)
       },
 
-      async find () {
+      async find() {
 
       },
       /**
        * @description 删除用户
        */
-      async removeUser () {
+      async removeUser() {
         this.removeModal = false
         if (this.removeObject == null) {
           this.$Message.warning('删除对象为空，无法继续执行！')
@@ -272,7 +272,7 @@
       /**
        * @description 获取用户列表
        */
-      async getData (status) {
+      async getData(status) {
         this.setting.loading = true
         try {
           let res = await get(this.$url.getOrderInfo, {
@@ -281,7 +281,7 @@
             status: status,
             number: 0
           })
-debugger
+          debugger
           this.data = res.data
         } catch (error) {
           this.$throw(error)
@@ -293,12 +293,13 @@ debugger
        * @param uid 用户ID
        * @param type 打开类型
        */
-      updateModel (index) {
+      updateModel(index) {
         this.modal.data = this.data.list[index]
         this.modal.data.orderStatus = this.modal.data.orderStatus + ''
         this.modal.data.orderinfoStatus = this.modal.data.orderinfoStatus + ''
         delete this.modal.data['createTime']
         delete this.modal.data['arriveTime']
+        debugger
         this.modal.show = true
       },
       /**
@@ -306,7 +307,7 @@ debugger
        * @param type 窗口类型
        * @param reload 是否重新加载数据
        */
-      onModalCancel (type, reload = false) {
+      onModalCancel(type, reload = false) {
         switch (type) {
           case 'add': {
             this.addUserModal = false
@@ -326,7 +327,7 @@ debugger
         }
         if (reload) this.getData()
       },
-      async ok () {
+      async ok() {
         try {
           let res = await post(this.$url.getUpdateOrderInfo, this.modal.data)
           this.data = res.data
@@ -339,13 +340,13 @@ debugger
         }
         this.modal.show = false
       },
-      cancel () {
+      cancel() {
         this.modal.show = false
       },
       /**
        * @description 导出表格CSV
        */
-      exportData (type) {
+      exportData(type) {
         if (type === 1) {
           this.$refs.table.exportCsv({
             filename: '用户数据-' + new Date().getTime(),

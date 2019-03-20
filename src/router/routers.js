@@ -100,7 +100,7 @@ export default [
       access: ['system']
     },
     children:[
-       { path: '#',meta:{icon: 'md-people', title: '用户结算',access: ['system:xxxxx']}, name: '', component: () => import('@/view/system/user') },
+       { path: '#',meta:{icon: 'md-analytics', title: '用户结算',access: ['system:xxxxx']}, name: '', component: () => import('@/view/system/user') },
       /*  { path: 'person-stalker',meta:{icon: 'md-body',title: '角色管理'}, name: 'system_role', component: () => import('@/view/system/role') },
         { path: 'resource',meta:{icon: 'ios-lock',title: '资源管理'}, name: 'system_resource', component: () => import('@/view/system/resource') },
         { path: 'log',meta:{icon: 'ios-aperture',title: '系统日志'}, name: 'system_log', component: () => import('@/view/system/log') },*/
@@ -216,7 +216,7 @@ export default [
       access: ['common:common']
     },
     children:[
-      { path: 'slide',meta:{icon: 'md-people', title: '轮播图管理',access: ['common:slide']}, name: 'slide', component: () => import('@/view/common/slide') },
+      { path: 'slide',meta:{icon: 'ios-apps', title: '轮播图管理',access: ['common:slide']}, name: 'slide', component: () => import('@/view/common/slide') },
     ]
   },
 
@@ -230,7 +230,7 @@ export default [
       access: ['common:app']
     },
     children:[
-      { path: 'update',meta:{icon: 'md-basket',title: 'app版本更新',access: ['common:update']}, name: 'update', component: () => import('@/view/common/update') },
+      { path: 'update',meta:{icon: 'logo-hackernews',title: 'app版本更新',access: ['common:update']}, name: 'update', component: () => import('@/view/common/update') },
 
     ]
   },

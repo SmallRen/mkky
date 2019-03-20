@@ -10,9 +10,7 @@
           <Row>
             <Col span="15">
 
-              <Button :disabled="setting.loading" type="success" @click="getData">
-                <Icon type="md-refresh"></Icon>&nbsp;刷新数据
-              </Button>
+
 
             </Col>
             <Col span="9">

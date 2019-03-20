@@ -12,13 +12,7 @@
               <Button type="info" @click="modalAdd()">
                 <Icon type="md-add"></Icon>&nbsp;添加
               </Button>
-              <Button :disabled="setting.loading" type="success" @click="getData">
-                <Icon type="md-refresh"></Icon>&nbsp;刷新数据
-              </Button>
 
-              <Button :disabled="selections.length==0 || setting.loading" type="error" @click="sendEmail(false)">
-                <Icon type="trash-a"></Icon>&nbsp;发送邮件
-              </Button>
             </Col>
             <Col span="9">
               <Input v-model="search.value" placeholder="请输入您想要搜索的内容..." @click="find()" class="margin-bottom-10">

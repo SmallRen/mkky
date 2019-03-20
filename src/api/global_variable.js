@@ -25,6 +25,8 @@ const getDeleteOrderInfo = '/cms/Orderinfo/getDeleteOrderInfo'
 const getUpdateOrderInfo = '/cms/Orderinfo/getUpdateOrderinfo'
 //获取订单
 const getOrderInfo = '/cms/Orderinfo/getOrderinfo'
+//获取所有订单
+const getOrderInfoByAll = '/cms/Orderinfo/getOrderinfoByAll'
 //********************************************查询转账
 const WithdrawalOrderByKey = '/cms/withdrawalOrder/WithdrawalOrderByKey'
 //修改
@@ -107,7 +109,7 @@ export default {
   //资讯列表
   informationList, informationDelete, informationAdd, informationUpdate,
   //订单管理
-  getDeleteOrderInfo, getUpdateOrderInfo, getOrderInfo,
+  getDeleteOrderInfo, getUpdateOrderInfo, getOrderInfo,getOrderInfoByAll,
   //转账管理
   WithdrawalOrderByKey, orderUpdate, getOrderList,WithdrawalOrderBylist,
   //矿机管理

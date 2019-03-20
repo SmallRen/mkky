@@ -8,16 +8,19 @@
       <div>
         <template>
           <Row>
+
+
             <Col span="15">
+              <Button type="info" @click="getOrderInfoByAll1()">
+                <Icon type="md-albums"></Icon>&nbsp;所有数据
+              </Button>
               <Button type="warning" @click="orderStatus(0)">
                 <Icon type="md-albums"></Icon>&nbsp;待审核
               </Button>
               <Button type="success" @click="orderStatus(1)">
                 <Icon type="md-checkmark"></Icon>&nbsp;已完成
               </Button>
-              <Button :disabled="setting.loading" type="success" @click="getData">
-                <Icon type="md-refresh"></Icon>&nbsp;刷新数据
-              </Button>
+
 
 
             </Col>
@@ -211,11 +214,25 @@
     },
     components: {},
     created() {
-      this.getData(this.order_status)
+      this.getOrderInfoByAll1()
       this.getCurrencyList()
 
     },
     methods: {
+      async getOrderInfoByAll1(){
+        this.setting.loading = true
+        try {
+          let res = await get(this.$url.getOrderInfoByAll, {
+            page: this.dataFilter.page,
+            rows: this.dataFilter.pageSize,
+          })
+          this.data = res.data
+        } catch (error) {
+          this.$throw(error)
+        }
+        this.setting.loading = false
+      },
+
       orderStatus(status) {
         this.order_status = status
         this.getData(status)
@@ -281,7 +298,6 @@
             status: status,
             number: 0
           })
-          debugger
           this.data = res.data
         } catch (error) {
           this.$throw(error)

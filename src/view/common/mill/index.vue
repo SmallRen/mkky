@@ -12,9 +12,7 @@
               <Button type="info" @click="openAddModal(null)">
                 <Icon type="md-add"></Icon>&nbsp;添加
               </Button>
-              <Button :disabled="setting.loading" type="success" @click="getData">
-                <Icon type="md-refresh"></Icon>&nbsp;刷新数据
-              </Button>
+
 
 
             </Col>

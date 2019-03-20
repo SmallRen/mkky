@@ -19,9 +19,7 @@
               <Button :disabled="setting.loading" type="error" @click="getOrderStatus('2')">
                 <Icon type="md-close"/>&nbsp;提现失败
               </Button>
-              <Button :disabled="setting.loading" type="success" @click="getData">
-                <Icon type="md-refresh"></Icon>&nbsp;刷新数据
-              </Button>
+
 
 
 

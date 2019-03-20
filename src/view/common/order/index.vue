@@ -50,7 +50,7 @@
         </FormItem>
         <FormItem label="订单描述" prop="orderDescription">
           <Select v-model="modal.data.orderDescription" style="width:200px">
-            <Option v-for="item in currencyList" :value="item.currencyName" :key="item.currencyName">{{
+            <Option v-for="item in currencyList" :value="item.currencyName" >{{
               item.currencyName }}
             </Option>
           </Select>
@@ -60,7 +60,7 @@
         <FormItem label="订单状态" prop="orderStatus">
           <RadioGroup v-model="modal.data.orderStatus">
             <Radio label="0">待审核</Radio>
-            <Radio label="1">以完成</Radio>
+            <Radio label="1">已完成</Radio>
           </RadioGroup>
         </FormItem>
         <FormItem label="订单状态" prop="orderinfoStatus">
@@ -132,12 +132,12 @@
             align: 'center'
           },
           { title: '订单ID', key: 'orderId', sortable: true },
-          { title: '用户ID', key: 'userId', sortable: true },
+          { title: '用户名', key: 'userId', sortable: true },
           { title: '矿机Id', key: 'machineId', sortable: true },
           { title: '类型', key: 'orderDescription', sortable: true },
 
           {
-            title: '创建日期',
+            title: '提交日期',
             key: 'createTime',
             render: (h, params) => {
               return h('span', dayjs(params.row.createTime * 1000).format('YYYY年MM月DD日 HH:mm:ss'))
@@ -281,9 +281,9 @@
             page: this.dataFilter.page,
             rows: this.dataFilter.pageSize,
             status: status,
-            number: 1
+            number: 0
           })
-
+debugger
           this.data = res.data
         } catch (error) {
           this.$throw(error)

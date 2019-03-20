@@ -76,7 +76,7 @@
           },
           { title: '用户id', key: 'userId', sortable: true },
           { title: '真实名字', key: 'userRealName', width: 100, align: 'center' },
-          {
+         /* {
             title: '头像', key: 'userImg', width: 100,
             render: (h, params) => {
               return h('div', [
@@ -92,7 +92,7 @@
                 },)])
             },
 
-          },
+          },*/
           { title: '用户电话', key: 'userPhone', sortable: true, width: 120 },
           { title: '身份证', key: 'idNumber', sortable: true, width: 160, align: 'center' },
           { title: '邮箱', key: 'userEmail', sortable: true, width: 180, align: 'center' },
@@ -125,7 +125,7 @@
           {
             title: '操作',
             key: 'action',
-            width: 100,
+            width: 200,
             sortable: true,
             align: 'center',
             render: (h, params) => {
@@ -139,6 +139,15 @@
                     }
                   }
                 }, params.row.state == 1 ? '冻结' : '恢复'),
+                h('Button', {
+                  props: { type:  'warning', size: 'small' },
+                  style: { marginRight: '5px' },
+                  on: {
+                    click: () => {
+
+                    }
+                  }
+                }, '查看钱包'),
               ])
             }
           }

@@ -53,6 +53,8 @@ const MiningMachineBasicList = '/cms/MiningMachineBasic/list'
 const deleteMining = '/cms/MiningMachineBasic/deleteMining'
 //修改模板
 const updateMining = '/cms/MiningMachineBasic/updateMining'
+//添加模板
+const insertMining = '/cms/MiningMachineBasic/insertMining'
 //主键查询矿机模板
 const KeyList = '/cms/MiningMachineBasic/Keylist'
 //******************************************用户管理
@@ -108,7 +110,7 @@ export default {
   //矿机管理
   listMiningMachine, KeyListMiningMachine, updateMiningMachine, deleteMiningMachine, insertMiningMachine,
   //模板管理
-  MiningMachineBasicList, deleteMining, updateMining, KeyList,
+  MiningMachineBasicList, deleteMining, updateMining, KeyList,insertMining,
   //用户管理
   login, list, update,
   //教程管理

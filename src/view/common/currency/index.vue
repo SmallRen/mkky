@@ -100,7 +100,8 @@
         resetPasswordUser: null,
         selections: [],
         removeModal: {
-          show: false
+          show: false,
+          loading: false,
         },
         setting: {
           loading: true,
@@ -192,6 +193,10 @@
                   style: { marginRight: '5px' },
                   on: {
                     click: () => {
+                      this.removeObject = {
+                        obj: params.row,
+                        index: params.index
+                      }
                       this.modalUpdate(params.index)
                     }
                   }
@@ -439,17 +444,17 @@
           if (res.status === 1) {
             this.modal.loading = false
             this.$Message.success('操作成功')
-            let data = JSON.parse(JSON.stringify(this.modal.data))
-            this.data.list.push(data)
+            this.getData()
           } else {
             this.$Message.error('操作失败')
           }
         } catch (error) {
           this.$throw(error)
-          this.modal.loading = false
-          this.modal.show = false
+
 
         }
+        this.modal.loading = false
+        this.modal.show = false
       }
       ,
       /**

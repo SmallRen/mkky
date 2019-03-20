@@ -9,7 +9,9 @@
         <template>
           <Row>
             <Col span="15">
-
+              <Button type="info" @click="openAddModal(null)">
+                <Icon type="md-add"></Icon>&nbsp;添加
+              </Button>
               <Button :disabled="setting.loading" type="success" @click="getData">
                 <Icon type="md-refresh"></Icon>&nbsp;刷新数据
               </Button>
@@ -145,16 +147,18 @@
         </row>
         <row>
           <Col span="12">
-            <FormItem label="电源=》网络环境" prop="powerSupply">
+            <FormItem label="网络环境" prop="powerSupply">
               <Input v-model.trim="modal.data.powerSupply"></Input>
             </FormItem>
           </Col>
-          <!--<Col span="12">
-            <FormItem label="入库时间" prop="computerTime">
-              <DatePicker :value="modal.data.computerTime" format="yyyy-MM-dd HH:mm:ss" type="datetime" placeholder="选择日期"
+          <Col span="12">
+            <FormItem label="入库时间" :hidden="hiddenMachineTime">
+
+
+              <DatePicker disabled :value="modal.data.computerTime" format="yyyy年MM月dd日 hh:mm:ss" type="date"
                           style="width: 200px"></DatePicker>
             </FormItem>
-          </Col>-->
+          </Col>
         </row>
 
 
@@ -188,10 +192,36 @@
   export default {
     data() {
       return {
+        hiddenMachineTime: true,
+        operation: '',
         modal: {
           loading: false,
           show: false,
           data: {
+            basicId: '',
+            basicName: '',
+            basicImg: '',
+            nameOfMine: '',
+            systemVersion: '',
+            networkType: '',
+            ipAddress: '',
+            subnetMask: '',
+            broadcastAddress: '',
+            orePan: '',
+            panSize: '',
+            maximumSize: '',
+            chassisHeight: '',
+            hotPlug: '',
+            hardDiskInterface: '',
+            cpuSize: '',
+            memorySize: '',
+            miningMachineSize: '',
+            systemHardDisk: '',
+            networkCard: '',
+            powerSupply: '',
+            computerTime: '',
+          },
+          data1: {
             basicId: '',
             basicName: '',
             basicImg: '',
@@ -242,7 +272,7 @@
             title: '入库时间',
             key: 'computerTime',
             render: (h, params) => {
-              return h('span', dayjs(params.row.computerTime * 1000).format('YYYY年MM月DD日 HH:mm:ss'))
+              return h('span', dayjs(params.row.computerTime).format('YYYY年MM月DD日 HH:mm:ss'))
             },
             sortable: true
           },
@@ -258,7 +288,7 @@
                   style: {marginRight: '5px'},
                   on: {
                     click: () => {
-                      this.updateModal(params.index)
+                      this.openAddModal(params.index)
                     }
                   }
                 }, '修改'),
@@ -293,6 +323,22 @@
       this.getData()
     },
     methods: {
+      openAddModal(index) {
+        if (index === null) {
+          this.operation = 'add'
+          this.hiddenMachineTime = true
+          this.modal.data = this.modal.data1
+        } else {
+          let temp1 = this.data[index]
+          let obj = JSON.parse(JSON.stringify(temp1))
+          obj.computerTime = dayjs(obj.computerTime).format('YYYY年MM月DD日 HH:mm:ss')
+          this.modal.data = obj
+          this.modal.show = true
+          this.hiddenMachineTime = false
+          this.operation = 'update'
+        }
+        this.modal.show = true
+      },
       /**
        * @description 批量选择回调
        */
@@ -344,10 +390,19 @@
         this.deleteBasic()
       },
       async ok() {
+        let url = ''
+        if (this.operation === 'add') {
+          url = this.$url.insertMining
+        } else {
+          url = this.$url.updateMining
+        }
+        this.addUpdate(url)
+      },
+     async addUpdate(url) {
         delete this.modal.data['computerTime']
         this.modal.loading = true
         try {
-          let res = await post(this.$url.updateMining, this.modal.data)
+          let res = await post(url, this.modal.data)
           if (res.status === 1) {
             this.getData()
             this.$Message.success('操作成功！')
@@ -362,13 +417,6 @@
       },
       cancel() {
         this.modal.show = false
-      },
-      updateModal(index) {
-        let temp1 = this.data[index]
-        let obj = JSON.parse(JSON.stringify(temp1))
-        this.modal.data = obj
-        //this.modal.data.computerTime = dayjs(this.modal.data.computerTime *1000).format('YYYY年MM月DD日 HH:mm:ss')
-        this.modal.show = true
       },
       async deleteBasic() {
         this.setting.loading = true

@@ -18,9 +18,7 @@
               <Button type="primary" @click="exportData(1)">
                 <Icon type="ios-download-outline"></Icon>&nbsp;导出表格
               </Button>
-              <Button type="info" onClick="Javascript:location.href='/common/mill-template'">
-                <Icon type="md-add"></Icon>&nbsp;添加矿机模板
-              </Button>
+
             </Col>
             <Col span="9">
               <Input v-model="search.value" placeholder="请输入您想要搜索的内容..." @click="find()" class="margin-bottom-10">
@@ -54,7 +52,18 @@
     <Modal v-model="modal.show" title="属性"
            :mask-closable="false" :closable="false" :width="1000">
       <Form ref="modalForm" :model="modal" :label-width="120">
+        <row>
+          <Col span="12">
+            <FormItem label="矿机模板选择">
+              <Select v-model="millTemplateValue" style="width:200px" :on-change="selectTemplate()">
+                <Option v-for="(item, index) in mill_template" :value="index">{{item.basicName }}
+                </Option>
+              </Select>
+            </FormItem>
 
+
+          </Col>
+        </row>
         <row>
           <Col span="8">
             <FormItem label="矿机名称" prop="machineName">
@@ -198,19 +207,19 @@
             </FormItem>
           </Col>
           <Col span="8">
-            <FormItem label="网卡=》矿场所在坐标" prop="networkCard">
+            <FormItem label="矿场所在坐标" prop="networkCard">
               <Input v-model.trim="modal.data.networkCard"></Input>
             </FormItem>
           </Col>
           <Col span="8">
-            <FormItem label="电源=》网络环境" prop="powerSupply">
+            <FormItem label="网络环境" prop="powerSupply">
               <Input v-model.trim="modal.data.powerSupply"></Input>
             </FormItem>
           </Col>
         </row>
         <row>
           <Col span="8">
-            <FormItem label="入库时间" prop="machineTime">
+            <FormItem label="入库时间" prop="machineTime" :hidden="hiddenMachineTime">
               <DatePicker disabled :value="modal.data.machineTime" format="yyyy年MM月dd日 hh:mm:ss" type="date"
                           style="width: 200px"></DatePicker>
             </FormItem>
@@ -237,7 +246,9 @@
         //批量选择
         selections: [],
         removeModal: false,
+        millTemplateValue: '',
         //添加修改的模态框绑定的数据
+        hiddenMachineTime: false,
         modal: {
           loading: false,
           show: false,
@@ -306,6 +317,7 @@
             machineTime: ''
           }
         },
+        mill_template: [],
         setting: {
           loading: true,
           showBorder: true
@@ -374,8 +386,52 @@
     components: {},
     created() {
       this.getData()
+      this.getMillTemplate()
     },
     methods: {
+      selectTemplate() {
+        if (this.millTemplateValue !== '') {
+          let obj = this.mill_template[this.millTemplateValue];
+          this.modal.data.nameOfMine = obj.nameOfMine
+          this.modal.data.machineImg = obj.basicImg
+          this.modal.data.systemVersion = obj.systemVersion
+          this.modal.data.networkType = obj.networkType
+          this.modal.data.ipAddress = obj.ipAddress
+          this.modal.data.subnetMask = obj.subnetMask
+          this.modal.data.broadcastAddress = obj.broadcastAddress
+          this.modal.data.harddiskTub = obj.orePan
+          this.modal.data.harddiskSize = obj.panSize
+          this.modal.data.harddiskMax = obj.maximumSize
+          this.modal.data.chassisHeight = obj.chassisHeight
+          this.modal.data.hotPlug = obj.hotPlug
+          this.modal.data.hardDiskInterface = obj.hardDiskInterface
+          this.modal.data.cpuSize = obj.cpuSize
+          this.modal.data.storageSize = obj.memorySize
+          this.modal.data.machineStorage = obj.miningMachineSize
+          this.modal.data.systemHardDisk = obj.systemHardDisk
+          this.modal.data.networkCard = obj.networkCard
+          this.modal.data.powerSupply = obj.powerSupply
+        }
+        console.log(this.modal.data)
+
+      },
+      async getMillTemplate() {
+        try {
+          let res = await get(this.$url.MiningMachineBasicList, {
+            page: 1,
+            rows: 100
+          })
+          if (res.status === 1) {
+            this.mill_template = res.data
+          } else {
+            this.$Message.error('操作失败')
+          }
+        } catch (error) {
+          this.$throw(error)
+        }
+      },
+
+
       /**
        * @description 批量选择回调
        */
@@ -459,8 +515,10 @@
       openAddModal(index) {
         if (index === null) {
           this.operation = 'add'
+          this.hiddenMachineTime = true
           this.modal.data = this.modal.data1
         } else {
+          this.hiddenMachineTime = false
           this.operation = 'update'
           this.modal.data = this.data.list[index]
           this.modal.data.machineTime = dayjs(this.data.list[index].machineTime).format('YYYY年MM月DD日 HH:mm:ss')

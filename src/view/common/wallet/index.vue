@@ -17,15 +17,15 @@
                 <Icon type="ios-download-outline"></Icon>&nbsp;导出表格
               </Button>
               <Button :disabled="setting.loading" type="warning" @click="getOrderStatus('0')">
-                <Icon type="md-color-filter" />&nbsp;待审核
+                <Icon type="md-color-filter"/>&nbsp;待审核
               </Button>
               <Button :disabled="setting.loading" type="success" @click="getOrderStatus('1')">
-                <Icon type="md-checkmark" />已完成
+                <Icon type="md-checkmark"/>
+                已完成
               </Button>
               <Button :disabled="setting.loading" type="error" @click="getOrderStatus('2')">
-                <Icon type="md-close" />&nbsp;提现失败
+                <Icon type="md-close"/>&nbsp;提现失败
               </Button>
-
 
 
             </Col>
@@ -54,7 +54,8 @@
         <p>此操作为不可逆操作，是否确认完成？</p>
       </div>
       <div slot="footer">
-        <Button type="success" size="large" long :loading="updateModal.setting.loading" @click="handleFinish">确认处理完成</Button>
+        <Button type="success" size="large" long :loading="updateModal.setting.loading" @click="handleFinish">确认处理完成
+        </Button>
       </div>
     </Modal>
 
@@ -63,15 +64,15 @@
 </template>
 <script>
   import dayjs from 'dayjs'
-  import { post, get, put } from '@/libs/axios-cfg'
+  import {post, get, put} from '@/libs/axios-cfg'
 
   export default {
-    data () {
+    data() {
       return {
         updateIndex: '',
         selections: [],
-        updateModal:{
-          show:false,
+        updateModal: {
+          show: false,
           setting: {
             loading: false,
             showBorder: false
@@ -91,10 +92,10 @@
             width: 60,
             align: 'center'
           },
-          { title: '提现订单id', key: 'withdrawalId', sortable: true },
-          { title: '提现的用户', key: 'withdrawalUserid', sortable: true },
-          { title: '提现说明', key: 'withdrawalExplain', sortable: true },
-          { title: '提现金额', key: 'withdrawalMoney', sortable: true },
+          {title: '提现订单id', key: 'withdrawalId', sortable: true},
+          {title: '提现的用户', key: 'withdrawalUserid', sortable: true},
+          {title: '提现说明', key: 'withdrawalExplain', sortable: true},
+          {title: '提现金额', key: 'withdrawalMoney', sortable: true},
 
           {
             title: '提现时间',
@@ -110,9 +111,9 @@
             align: 'center',
             render: (h, params) => {
               if (params.row.withdrawalState == 0) {
-                return h('Tag', { props: { color: 'success' } }, '正在处理')
+                return h('Tag', {props: {color: 'success'}}, '正在处理')
               } else {
-                return h('Tag', { props: { color: 'primary' } }, '已完成')
+                return h('Tag', {props: {color: 'primary'}}, '已完成')
               }
 
             },
@@ -125,11 +126,11 @@
             render: (h, params) => {
               if (params.row.withdrawalState == 0) {
                 return h('Button', {
-                  props: { type: 'primary', size: 'small' },
-                  style: { marginRight: '5px' },
+                  props: {type: 'primary', size: 'small'},
+                  style: {marginRight: '5px'},
                   on: {
                     click: () => {
-                      this.updataStatus(params.index)
+                      this.updateStatus(params.index)
                     }
                   }
                 }, '处理完成')
@@ -148,44 +149,44 @@
       }
     },
     components: {},
-    created () {
+    created() {
       this.getData()
     },
     methods: {
       /**
        * @description 批量选择回调
        */
-      selectionChange (list) {
+      selectionChange(list) {
         this.selections = list
       },
       /**
        * @description 分页更换事件回调
        */
-      pageChange (p) {
+      pageChange(p) {
         this.dataFilter.page = p
         this.getData()
       },
       /**
        * @description 分页每页显示数量改变事件回调
        */
-      pageSizeChange (p) {
+      pageSizeChange(p) {
         this.dataFilter.pageSize = p
         this.getData()
       },
 
-      async getOrderStatus(status){
+      async getOrderStatus(status) {
         try {
           let res = await get(this.$url.WithdrawalOrderBylist, {
             page: this.dataFilter.page,
             rows: this.dataFilter.pageSize,
-            withdrawal_state:status
+            withdrawal_state: status
           })
           this.data = res.data
         } catch (error) {
           this.$throw(error)
         }
       },
-      async find () {
+      async find() {
 
         if (this.search.value === '') {
           this.$Message.error('模板id不能为空')
@@ -206,18 +207,16 @@
           this.$throw(error)
         }
       },
-      updataStatus (index) {
+      updateStatus(index) {
         this.updateIndex = index
         this.updateModal.show = true
-
       },
-      async handleFinish () {
+      async handleFinish() {
         try {
           let res = await post(this.$url.orderUpdate, {
             withdrawalId: this.data.list[this.updateIndex].withdrawalId,
             withdrawalState: 1,
           })
-
           if (res.status === 1) {
             this.data.list[this.updateIndex].withdrawalState = 1
             this.updateModal.setting.loading = false
@@ -234,7 +233,7 @@
       /**
        * @description 获取列表
        */
-      async getData () {
+      async getData() {
         this.setting.loading = true
         try {
           let res = await get(this.$url.getOrderList, {
@@ -251,7 +250,7 @@
       /**
        * @description 导出表格CSV
        */
-      exportData (type) {
+      exportData(type) {
         if (type === 1) {
           this.$refs.table.exportCsv({
             filename: '用户数据-' + new Date().getTime(),

@@ -15,9 +15,7 @@
               <Button :disabled="setting.loading" type="success" @click="getData">
                 <Icon type="md-refresh"></Icon>&nbsp;刷新数据
               </Button>
-              <Button type="primary" @click="exportData(1)">
-                <Icon type="ios-download-outline"></Icon>&nbsp;导出表格
-              </Button>
+
               <Button :disabled="selections.length==0 || setting.loading" type="error" @click="sendEmail(false)">
                 <Icon type="trash-a"></Icon>&nbsp;发送邮件
               </Button>
@@ -408,7 +406,6 @@
             let url = ''
             url = this.$url.getUpdateCourse
             this.modal.loading = true
-            let a=this.modal.data;
             this.update(url)
           }
         })
@@ -453,8 +450,7 @@
             this.data.list[this.updateIndex].contentState = this.modal.data.contentState
             this.modal.loading = false
             this.$Message.success('操作成功')
-            let data = JSON.parse(JSON.stringify(this.modal.data))
-            this.data.list.push(data)
+            this.getData()
           } else {
             this.$Message.error('操作失败')
           }

@@ -9,13 +9,6 @@
         <template>
           <Row>
             <Col span="15">
-
-              <Button :disabled="setting.loading" type="success" @click="getData">
-                <Icon type="md-refresh"></Icon>&nbsp;刷新数据
-              </Button>
-              <Button type="primary" @click="exportData(1)">
-                <Icon type="ios-download-outline"></Icon>&nbsp;导出表格
-              </Button>
               <Button :disabled="setting.loading" type="warning" @click="getOrderStatus('0')">
                 <Icon type="md-color-filter"/>&nbsp;待审核
               </Button>
@@ -26,6 +19,11 @@
               <Button :disabled="setting.loading" type="error" @click="getOrderStatus('2')">
                 <Icon type="md-close"/>&nbsp;提现失败
               </Button>
+              <Button :disabled="setting.loading" type="success" @click="getData">
+                <Icon type="md-refresh"></Icon>&nbsp;刷新数据
+              </Button>
+
+
 
 
             </Col>

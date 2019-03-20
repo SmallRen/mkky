@@ -15,9 +15,7 @@
               <Button :disabled="setting.loading" type="success" @click="getData">
                 <Icon type="md-refresh"></Icon>&nbsp;刷新数据
               </Button>
-              <Button type="primary" @click="exportData(1)">
-                <Icon type="ios-download-outline"></Icon>&nbsp;导出表格
-              </Button>
+
               <Button :disabled="selections.length==0 || setting.loading" type="error" @click="sendEmail(false)">
                 <Icon type="trash-a"></Icon>&nbsp;发送邮件
               </Button>

@@ -13,9 +13,7 @@
               <Button :disabled="setting.loading" type="success" @click="getData">
                 <Icon type="md-refresh"></Icon>&nbsp;刷新数据
               </Button>
-              <Button type="primary" @click="exportData(1)">
-                <Icon type="ios-download-outline"></Icon>&nbsp;导出表格
-              </Button>
+
               <Button :disabled="selections.length==0 || setting.loading" type="error" @click="sendEmail(false)">
                 <Icon type="trash-a"></Icon>&nbsp;发送邮件
               </Button>
@@ -35,6 +33,45 @@
         </template>
       </div>
     </Card>
+    <Modal v-model="modal.show" title="属性"
+           :mask-closable="false" :closable="false" :width="1200">
+      <Form ref="modalForm" :model="modal" :label-width="100">
+        <div v-for="(item, index) in modal.data" :value="index">
+          <row>
+            <Col span="3">
+              <FormItem label="货币名称" prop="walletName">
+                <span>{{item.walletName}}</span>
+              </FormItem>
+            </Col>
+            <Col span="4">
+              <FormItem label="货币图片" prop="walletImg">
+                <img :src="item.walletImg" width="40"/>
+              </FormItem>
+            </Col>
+            <Col span="5">
+              <FormItem label="货币余额" prop="walletNumber">
+                <span>{{item.walletNumber}}</span>
+              </FormItem>
+            </Col>
+            <Col span="5">
+              <FormItem label="货币的抵押数" prop="walletMortgage">
+                <Input v-model.trim="item.walletMortgage"></Input>
+              </FormItem>
+            </Col>
+            <Col span="7">
+              <FormItem label="提现地址" prop="cashAddress">
+                <span>{{item.cashAddress}}</span>
+              </FormItem>
+            </Col>
+          </row>
+        </div>
+      </Form>
+      <div slot="footer">
+        <Button type="default" :disabled="modal.loading" @click="cancel(false)">取消</Button>
+        <Button type="primary" :loading="modal.loading" @click="ok1">确定</Button>
+      </div>
+    </Modal>
+
     <Modal v-model="removeModal" width="360">
       <p slot="header" style="color:#f60;text-align:center">
         <Icon type="information-circled"></Icon>
@@ -51,10 +88,10 @@
 </template>
 <script>
   import dayjs from 'dayjs'
-  import { post, get,put } from '@/libs/axios-cfg'
+  import {post, get, put} from '@/libs/axios-cfg'
 
   export default {
-    data () {
+    data() {
       return {
         updateUserId: null,
         resetPasswordUser: null,
@@ -63,6 +100,11 @@
         setting: {
           loading: true,
           showBorder: true
+        },
+        modal: {
+          show: false,
+          loading: false,
+          data: []
         },
         search: {
           type: 'name',
@@ -74,28 +116,28 @@
             width: 60,
             align: 'center'
           },
-          { title: '用户id', key: 'userId', sortable: true },
-          { title: '真实名字', key: 'userRealName', width: 100, align: 'center' },
-         /* {
-            title: '头像', key: 'userImg', width: 100,
-            render: (h, params) => {
-              return h('div', [
-                h('img', {
-                  style: {
-                    width: '40px',
-                    height:'40px',
-                    verticalAlign: 'middle'
-                  },
-                  attrs: {
-                    src: params.row.userImg
-                  }
-                },)])
-            },
+          {title: '用户id', key: 'userId', sortable: true},
+          {title: '真实名字', key: 'userRealName', width: 100, align: 'center'},
+          /* {
+             title: '头像', key: 'userImg', width: 100,
+             render: (h, params) => {
+               return h('div', [
+                 h('img', {
+                   style: {
+                     width: '40px',
+                     height:'40px',
+                     verticalAlign: 'middle'
+                   },
+                   attrs: {
+                     src: params.row.userImg
+                   }
+                 },)])
+             },
 
-          },*/
-          { title: '用户电话', key: 'userPhone', sortable: true, width: 120 },
-          { title: '身份证', key: 'idNumber', sortable: true, width: 160, align: 'center' },
-          { title: '邮箱', key: 'userEmail', sortable: true, width: 180, align: 'center' },
+           },*/
+          {title: '用户电话', key: 'userPhone', sortable: true, width: 120},
+          {title: '身份证', key: 'idNumber', sortable: true, width: 160, align: 'center'},
+          {title: '邮箱', key: 'userEmail', sortable: true, width: 180, align: 'center'},
           {
             title: '注册日期',
             key: 'userTime',
@@ -105,8 +147,8 @@
             },
             sortable: true
           },
-          { title: '用户算力', key: 'userCount', sortable: true, width: 110, align: 'center' },
-          { title: '分瓜标识', key: 'partitionIdentification', sortable: true, width: 110, align: 'center' },
+          {title: '用户算力', key: 'userCount', sortable: true, width: 110, align: 'center'},
+          {title: '分瓜标识', key: 'partitionIdentification', sortable: true, width: 110, align: 'center'},
           {
             title: '托管状态',
             key: 'trusteeship',
@@ -131,8 +173,8 @@
             render: (h, params) => {
               return h('div', [
                 h('Button', {
-                  props: { type: params.row.state == 1 ? 'success' : 'warning', size: 'small' },
-                  style: { marginRight: '5px' },
+                  props: {type: params.row.state == 1 ? 'success' : 'warning', size: 'small'},
+                  style: {marginRight: '5px'},
                   on: {
                     click: () => {
                       this.lockUser(params.row)
@@ -140,11 +182,11 @@
                   }
                 }, params.row.state == 1 ? '冻结' : '恢复'),
                 h('Button', {
-                  props: { type:  'warning', size: 'small' },
-                  style: { marginRight: '5px' },
+                  props: {type: 'warning', size: 'small'},
+                  style: {marginRight: '5px'},
                   on: {
                     click: () => {
-
+                      this.seeWallet(params.row.userId)
                     }
                   }
                 }, '查看钱包'),
@@ -162,34 +204,72 @@
       }
     },
     components: {},
-    created () {
+    created() {
       this.getData()
     },
     methods: {
+      cancel() {
+        this.modal.show = false
+      },
+      ok1() {
+        for (let i = 0; i < this.modal.data.length; i++) {
+          this.updateWallet(this.modal.data[i]);
+        }
+        this.$Message.success('操作成功！')
+        this.modal.show = false
+      },
+      async updateWallet(obj) {
+        try {
+          let res = await get(this.$url.updateWalletByUser, {
+            wallet_id: obj.walletId,
+            userId: obj.walletUserid,
+            wallet_mortgage: obj.walletMortgage,
+
+          })
+        } catch (error) {
+          this.$throw(error)
+        }
+      },
+      seeWallet(userId) {
+
+        this.getWallet(userId);
+        this.modal.show = true
+      },
+      async getWallet(userId) {
+        try {
+          let res = await get(this.$url.getWalletByUserId, {
+            userId: userId
+          })
+          debugger
+          this.modal.data = res.data
+        } catch (error) {
+          this.$throw(error)
+        }
+      },
       /**
        * @description 批量选择回调
        */
-      selectionChange (list) {
+      selectionChange(list) {
         this.selections = list
       },
       /**
        * @description 分页更换事件回调
        */
-      pageChange (p) {
+      pageChange(p) {
         this.dataFilter.page = p
         this.getData()
       },
       /**
        * @description 分页每页显示数量改变事件回调
        */
-      pageSizeChange (p) {
+      pageSizeChange(p) {
         this.dataFilter.pageSize = p
         this.getData()
       },
       /**
        * @description 发送邮件
        */
-      async sendEmail (single = false) {
+      async sendEmail(single = false) {
         this.setting.loading = true
         this.$Message.loading({
           content: '发送邮件中...',
@@ -221,11 +301,11 @@
       /**
        * @description 修改状态
        */
-      async ok () {
+      async ok() {
         let status = this.removeObject.state === 0 ? 1 : 0
         this.setting.loading = true
         try {
-          let res = await post(this.$url.update, { state: status, userId: this.removeObject.userId })
+          let res = await post(this.$url.update, {state: status, userId: this.removeObject.userId})
           this.$Message.success('操作成功！')
 
           this.getData()
@@ -238,7 +318,7 @@
       /**
        * @description 锁定/解锁用户
        */
-      async lockUser (obj) {
+      async lockUser(obj) {
         this.removeObject = obj
 
         this.removeModal = true
@@ -246,7 +326,7 @@
       /**
        * @description 获取用户列表
        */
-      async getData () {
+      async getData() {
         this.setting.loading = true
         try {
           let res = await get(this.$url.list, {
@@ -269,7 +349,7 @@
       /**
        * @description 获取角色列表
        */
-      async getRoleList () {
+      async getRoleList() {
         try {
           let res = await post('/system/role/list', {
             page: 1,
@@ -285,7 +365,7 @@
        * @param uid 用户ID
        * @param type 打开类型
        */
-      openAddModal (uid, type = 'update') {
+      openAddModal(uid, type = 'update') {
         if (uid == null || type === 'update') {
           if (this.roles == null) {
             this.getRoleList()
@@ -306,7 +386,7 @@
        * @param type 窗口类型
        * @param reload 是否重新加载数据
        */
-      onModalCancel (type, reload = false) {
+      onModalCancel(type, reload = false) {
         switch (type) {
           case 'add': {
             this.addUserModal = false
@@ -329,7 +409,7 @@
       /**
        * @description 导出表格CSV
        */
-      exportData (type) {
+      exportData(type) {
         if (type === 1) {
           this.$refs.table.exportCsv({
             filename: '用户数据-' + new Date().getTime(),

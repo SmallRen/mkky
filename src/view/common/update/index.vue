@@ -15,9 +15,7 @@
               <Button :disabled="setting.loading" type="success" @click="getData">
                 <Icon type="md-refresh"></Icon>&nbsp;刷新数据
               </Button>
-              <Button type="primary" @click="exportData(1)">
-                <Icon type="ios-download-outline"></Icon>&nbsp;导出表格
-              </Button>
+
               <Button :disabled="selections.length==0 || setting.loading" type="error" @click="sendEmail(false)">
                 <Icon type="trash-a"></Icon>&nbsp;发送邮件
               </Button>
@@ -42,10 +40,10 @@
     <Modal v-model="modal.show" title="属性"
            :mask-closable="false" :closable="false" :width="800">
       <Form ref="modalForm" :model="modal" :label-width="80">
-        <FormItem label="版本说明" prop="imprint">
+        <FormItem label="版本号" prop="imprint">
           <Input v-model.trim="modal.data.imprint"></Input>
         </FormItem>
-        <FormItem label="图片地址" prop="chainedAddress">
+        <FormItem label="版本链接" prop="chainedAddress">
           <Input v-model.trim="modal.data.chainedAddress"></Input>
         </FormItem>
       </Form>

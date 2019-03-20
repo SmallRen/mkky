@@ -13,9 +13,7 @@
               <Button :disabled="setting.loading" type="success" @click="getData">
                 <Icon type="md-refresh"></Icon>&nbsp;刷新数据
               </Button>
-              <Button type="primary" @click="exportData(1)">
-                <Icon type="ios-download-outline"></Icon>&nbsp;导出表格
-              </Button>
+
             </Col>
             <Col span="9">
               <Input v-model="search.value" placeholder="请输入您想要搜索的内容..." @click="find()" class="margin-bottom-10">
@@ -80,9 +78,10 @@
           },
           { title: '意见反馈id', key: 'feedback_id', sortable: true, align: 'center', width: 300, },
           { title: '反馈用户', key: 'feedback_user', sortable: true, align: 'center', width: 180, },
-          { title: '资讯图片url', key: 'feedback_comment', sortable: true, align: 'center', },
+          { title: '反馈内容', key: 'feedback_comment', sortable: true, align: 'center', },
+          { title: '反馈手机号', key: 'phone', sortable: true, align: 'center', },
           {
-            title: '创建日期',
+            title: '反馈时间',
             key: 'feedback_Time', width: 200,
             render: (h, params) => {
               return h('span', dayjs(params.row.feedback_Time*1000).format('YYYY年MM月DD日 HH:mm:ss'))

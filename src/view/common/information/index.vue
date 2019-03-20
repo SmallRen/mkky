@@ -15,9 +15,7 @@
               <Button :disabled="setting.loading" type="success" @click="getData">
                 <Icon type="md-refresh"></Icon>&nbsp;刷新数据
               </Button>
-              <Button type="primary" @click="exportData(1)">
-                <Icon type="ios-download-outline"></Icon>&nbsp;导出表格
-              </Button>
+
               <Button :disabled="selections.length==0 || setting.loading" type="error" @click="sendEmail(false)">
                 <Icon type="trash-a"></Icon>&nbsp;发送邮件
               </Button>
@@ -95,7 +93,6 @@
       </div>
     </Modal>
 
-    <Update v-if="updateUserModal" :roles="roles" :uid="updateUserId" @cancel="onModalCancel"/>
   </div>
 </template>
 <script>
@@ -111,9 +108,6 @@
       return {
         updateIndex: '',
         typeOperation: '',
-        updateUserModal: false,
-        resetPasswordModal: false,
-        updateUserId: null,
         resetPasswordUser: null,
         selections: [],
         removeModal: {
@@ -233,7 +227,6 @@
       }
     },
     components: {
-      Update, Editor, imgUp
     },
     created () {
       this.getData()
@@ -448,7 +441,7 @@
       async update (url) {
         try {
           let res = await post(url, this.modal.data)
-
+          debugger
           if (res.status === 1) {
             this.modal.loading = false
             this.$Message.success('操作成功')

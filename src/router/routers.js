@@ -174,19 +174,7 @@ export default [
       { path: 'mill-template',meta:{icon: 'md-basket',title: '矿机模板',access: ['common:template']}, name: 'template', component: () => import('@/view/common/template') },
     ]
   },
-  {
-    path: '/common',
-    name: 'common',
-    component: Main,
-    meta: {
-      title: '公共设置',
-      icon:'ios-albums',
-      access: ['common:common']
-    },
-    children:[
-      { path: 'slide',meta:{icon: 'md-people', title: '轮播图管理',access: ['common:slide']}, name: 'slide', component: () => import('@/view/common/slide') },
-]
-  },
+
 
   {
     path: '/common',
@@ -218,7 +206,19 @@ export default [
     { path: 'course',meta:{icon: 'md-outlet',title: '教程管理',access: ['common:course']}, name: 'course', component: () => import('@/view/common/course') },
     ]
   },
-
+  {
+    path: '/common',
+    name: 'common',
+    component: Main,
+    meta: {
+      title: '公共设置',
+      icon:'ios-albums',
+      access: ['common:common']
+    },
+    children:[
+      { path: 'slide',meta:{icon: 'md-people', title: '轮播图管理',access: ['common:slide']}, name: 'slide', component: () => import('@/view/common/slide') },
+    ]
+  },
 
   {
     path: '/common',

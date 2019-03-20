@@ -9,19 +9,17 @@
         <template>
           <Row>
             <Col span="15">
-
-              <Button :disabled="setting.loading" type="success" @click="getData">
-                <Icon type="md-refresh"></Icon>&nbsp;刷新数据
-              </Button>
-              <Button type="primary" @click="exportData(1)">
-                <Icon type="ios-download-outline"></Icon>&nbsp;导出表格
-              </Button>
               <Button type="warning" @click="orderStatus(0)">
                 <Icon type="md-albums"></Icon>&nbsp;待审核
               </Button>
               <Button type="success" @click="orderStatus(1)">
                 <Icon type="md-checkmark"></Icon>&nbsp;已完成
               </Button>
+              <Button :disabled="setting.loading" type="success" @click="getData">
+                <Icon type="md-refresh"></Icon>&nbsp;刷新数据
+              </Button>
+
+
             </Col>
             <Col span="9">
               <Input v-model="search.value" placeholder="请输入您想要搜索的内容..." @click="find()" class="margin-bottom-10">

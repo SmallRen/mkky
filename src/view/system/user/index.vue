@@ -11,7 +11,6 @@
             <Col span="15">
 
 
-
               <Button :disabled="selections.length==0 || setting.loading" type="error" @click="sendEmail(false)">
                 <Icon type="trash-a"></Icon>&nbsp;发送邮件
               </Button>
@@ -43,7 +42,7 @@
             </Col>
             <Col span="4">
               <FormItem label="货币图片" prop="walletImg">
-                <img :src="item.walletImg"   style="width: 40px;height: 40px" />
+                <img :src="item.walletImg" style="width: 40px;height: 40px"/>
               </FormItem>
             </Col>
             <Col span="5">
@@ -66,10 +65,37 @@
       </Form>
       <div slot="footer">
         <Button type="default" :disabled="modal.loading" @click="cancel(false)">取消</Button>
-        <Button type="primary" :loading="modal.loading" @click="ok1">确定</Button>
+        <Button type="primary" :loading="modal.loading" @click="ok">确定</Button>
       </div>
     </Modal>
+    <Modal v-model="modal2.show" title="属性"
+           :mask-closable="false" :closable="false" :width="700">
+      <Form ref="modalForm" :model="modal2" :label-width="100">
 
+        <row>
+
+          <FormItem label="用戶电话" prop="userPhone">
+            <Input v-model.trim="modal2.data.userPhone"></Input>
+          </FormItem>
+
+          <FormItem label="分瓜标识" prop="partitionIdentification">
+            <Input v-model.trim="modal2.data.partitionIdentification"></Input>
+          </FormItem>
+
+          <FormItem label="托管状态" prop="trusteeship">
+            <RadioGroup v-model="modal2.data.trusteeship">
+              <Radio label="0">未托管</Radio>
+              <Radio label="1">已托管</Radio>
+            </RadioGroup>
+          </FormItem>
+
+        </row>
+      </Form>
+      <div slot="footer">
+        <Button type="default" :disabled="modal2.loading" @click="cancel1(false)">取消</Button>
+        <Button type="primary" :loading="modal2.loading" @click="ok1">更新</Button>
+      </div>
+    </Modal>
     <Modal v-model="removeModal" width="360">
       <p slot="header" style="color:#f60;text-align:center">
         <Icon type="information-circled"></Icon>
@@ -104,6 +130,7 @@
           loading: false,
           data: []
         },
+
         search: {
           type: 'name',
           value: ''
@@ -156,9 +183,9 @@
               return h('tag',
                 {
                   props: {
-                    color: params.row.status == 1 ? 'warning' : 'success'
+                    color: params.row.trusteeship == 1 ? 'warning' : 'success'
                   }
-                }, params.row.status == 1 ? '未托管' : '已托管')
+                }, params.row.trusteeship == 0 ? '未托管' : '已托管')
             },
             sortable: true
           },
@@ -170,6 +197,16 @@
             align: 'center',
             render: (h, params) => {
               return h('div', [
+
+                h('Button', {
+                  props: {type: 'info', size: 'small'},
+                  style: {marginRight: '5px'},
+                  on: {
+                    click: () => {
+                      this.updateUser(params.index)
+                    }
+                  }
+                }, '修改'),
                 h('Button', {
                   props: {type: params.row.state == 1 ? 'success' : 'warning', size: 'small'},
                   style: {marginRight: '5px'},
@@ -198,7 +235,13 @@
           pageSize: 10
         },
         removeObject: null,
-        roles: null
+        roles: null,
+
+        modal2: {
+          show: false,
+          loading: false,
+          data: {}
+        },
       }
     },
     components: {},
@@ -206,10 +249,41 @@
       this.getData()
     },
     methods: {
+
+      updateUser(index) {
+        let obj = JSON.parse(JSON.stringify(this.data.list[index]))
+        this.modal2.data =obj
+        this.modal2.data.trusteeship = this.modal2.data.trusteeship + ""
+        this.modal2.show = true
+      },
+       ok1() {
+        this.updateUserInfo();
+
+      },
+      async updateUserInfo(){
+        this.modal2.loading = true
+        try {
+          let res = await post(this.$url.updateUserById, this.modal2.data)
+          if (res.status === 1) {
+            this.$Message.success('操作成功')
+            this.getData()
+
+          } else {
+            this.$Message.error('操作失败')
+          }
+        } catch (error) {
+          this.$throw(error)
+        }
+        this.modal2.loading = false
+        this.modal2.show = false
+      },
+      cancel1() {
+        this.modal2.show = false
+      },
       cancel() {
         this.modal.show = false
       },
-      ok1() {
+      ok() {
         for (let i = 0; i < this.modal.data.length; i++) {
           this.updateWallet(this.modal.data[i]);
         }

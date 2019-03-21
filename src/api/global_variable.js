@@ -66,6 +66,7 @@ const login = '/cms/user/logincms'
 const list = '/cms/user/list'
 //用户状态管理
 const update = '/cms/user/update'
+const updateUserById = '/cms/user/updateUserById'
 //查看钱包
 const getWalletByUserId = '/cms/user//getWalletByUserId'
 const updateWalletByUser = '/cms/user//updateWalletByUser'
@@ -117,7 +118,7 @@ export default {
   //模板管理
   MiningMachineBasicList, deleteMining, updateMining, KeyList,insertMining,
   //用户管理
-  login, list, update,getWalletByUserId,updateWalletByUser,
+  login, list, update,getWalletByUserId,updateWalletByUser,updateUserById,
   //教程管理
   getCourseList, getDeleteCourse, getUpdateCourse, getCourse, getAddCourse,
   //币种管理

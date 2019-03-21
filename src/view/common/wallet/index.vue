@@ -9,6 +9,9 @@
         <template>
           <Row>
             <Col span="15">
+              <Button :disabled="setting.loading" type="info" @click="getData">
+                <Icon type="md-done-all" />&nbsp;所有审核
+              </Button>
               <Button :disabled="setting.loading" type="warning" @click="getOrderStatus('0')">
                 <Icon type="md-color-filter"/>&nbsp;待审核
               </Button>
@@ -50,7 +53,7 @@
         <p>此操作为不可逆操作，是否确认完成？</p>
       </div>
       <div slot="footer">
-        <Button type="success" size="large" long :loading="updateModal.setting.loading" @click="handleFinish">确认处理完成
+        <Button type="success" size="large" long :loading="updateModal.setting.loading" @click="handleFinish">确认处理
         </Button>
       </div>
     </Modal>
@@ -123,18 +126,43 @@
             width: 260,
             align: 'center',
             render: (h, params) => {
-              if (params.row.withdrawalState == 0 || params.row.withdrawalState == 2 ) {
-                return h('Button', {
-                  props: {type: 'primary', size: 'small'},
+              if (params.row.withdrawalState == 0  ) {
+
+                return  h('div', [
+                  h('Button', {
+                  props: {type: 'success', size: 'small'},
                   style: {marginRight: '5px'},
                   on: {
                     click: () => {
-                      this.updateStatus(params.index)
+                      this.updateStatus(params.index,"1")
                     }
                   }
-                }, '处理完成')
+                }, '处理完成'),
+                  h('Button', {
+                    props: {type: 'error', size: 'small'},
+                    style: {marginRight: '5px'},
+                    on: {
+                      click: () => {
+                        this.updateStatus(params.index,"2")
+                      }
+                    }
+                  }, '处理失败')
+              ])
               }
+              if (params.row.withdrawalState == 2  ) {
 
+                return  h('div', [
+                  h('Button', {
+                    props: {type: 'primary', size: 'small'},
+                    style: {marginRight: '5px'},
+                    on: {
+                      click: () => {
+                        this.updateStatus(params.index,"0")
+                      }
+                    }
+                  }, '待审核')
+                ])
+              }
             }
           }
         ],
@@ -143,6 +171,7 @@
           page: 1,
           pageSize: 10
         },
+        status:'',
         removeObject: null,
         roles: null
       }
@@ -206,7 +235,8 @@
           this.$throw(error)
         }
       },
-      updateStatus(index) {
+      updateStatus(index,status) {
+        this.status=status
         this.updateIndex = index
         this.updateModal.show = true
       },
@@ -214,10 +244,10 @@
         try {
           let res = await post(this.$url.orderUpdate, {
             withdrawalId: this.data.list[this.updateIndex].withdrawalId,
-            withdrawalState: 1,
+            withdrawalState: this.status,
           })
           if (res.status === 1) {
-            this.data.list[this.updateIndex].withdrawalState = 1
+           this.getData()
             this.updateModal.setting.loading = false
             this.updateModal.show = false
             this.$Message.success('操作成功')

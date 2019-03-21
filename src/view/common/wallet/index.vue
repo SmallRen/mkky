@@ -107,10 +107,13 @@
             align: 'center',
             render: (h, params) => {
               if (params.row.withdrawalState == 0) {
-                return h('Tag', {props: {color: 'success'}}, '正在处理')
-              } else {
+                return h('Tag', {props: {color: 'success'}}, '待审核')
+              } else if(params.row.withdrawalState == 1) {
                 return h('Tag', {props: {color: 'primary'}}, '已完成')
+              }else{
+                return h('Tag', {props: {color: 'error'}}, '提现失败')
               }
+
 
             },
           },
@@ -120,7 +123,7 @@
             width: 260,
             align: 'center',
             render: (h, params) => {
-              if (params.row.withdrawalState == 0) {
+              if (params.row.withdrawalState == 0 || params.row.withdrawalState == 2 ) {
                 return h('Button', {
                   props: {type: 'primary', size: 'small'},
                   style: {marginRight: '5px'},

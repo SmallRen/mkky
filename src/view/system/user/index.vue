@@ -43,7 +43,7 @@
             </Col>
             <Col span="4">
               <FormItem label="货币图片" prop="walletImg">
-                <img :src="item.walletImg" width="40"/>
+                <img :src="item.walletImg"   style="width: 40px;height: 40px" />
               </FormItem>
             </Col>
             <Col span="5">

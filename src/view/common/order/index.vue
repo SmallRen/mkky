@@ -12,7 +12,7 @@
 
             <Col span="15">
               <Button type="info" @click="getOrderInfoByAll1()">
-                <Icon type="md-albums"></Icon>&nbsp;所有数据
+                <Icon type="md-albums"></Icon>&nbsp;所有订单
               </Button>
               <Button type="warning" @click="orderStatus(0)">
                 <Icon type="md-albums"></Icon>&nbsp;待审核
@@ -59,7 +59,7 @@
 
 
         <FormItem label="订单状态" prop="orderStatus">
-          <RadioGroup v-model="modal.data.orderinfoStatus">
+          <RadioGroup v-model="modal.data.orderStatus">
             <Radio label="0">待审核</Radio>
             <Radio label="1">已完成</Radio>
           </RadioGroup>
@@ -293,6 +293,7 @@
             status: 0,
             number: status
           })
+          debugger
           this.data = res.data
         } catch (error) {
           this.$throw(error)
@@ -307,7 +308,6 @@
       updateModel(index) {
         this.modal.data = this.data.list[index]
         this.modal.data.orderStatus = this.modal.data.orderStatus + ''
-        this.modal.data.orderinfoStatus = this.modal.data.orderinfoStatus + ''
         delete this.modal.data['createTime']
         delete this.modal.data['arriveTime']
         debugger

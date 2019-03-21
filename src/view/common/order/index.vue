@@ -59,17 +59,12 @@
 
 
         <FormItem label="订单状态" prop="orderStatus">
-          <RadioGroup v-model="modal.data.orderStatus">
+          <RadioGroup v-model="modal.data.orderinfoStatus">
             <Radio label="0">待审核</Radio>
             <Radio label="1">已完成</Radio>
           </RadioGroup>
         </FormItem>
-        <FormItem label="订单状态" prop="orderinfoStatus">
-          <RadioGroup v-model="modal.data.orderinfoStatus">
-            <Radio label="0">添加切换记录</Radio>
-            <Radio label="1">删除切换记录</Radio>
-          </RadioGroup>
-        </FormItem>
+
       </Form>
       <div slot="footer">
         <Button type="default" :disabled="modal.loading" @click="cancel(false)">取消</Button>
@@ -295,8 +290,8 @@
           let res = await get(this.$url.getOrderInfo, {
             page: this.dataFilter.page,
             rows: this.dataFilter.pageSize,
-            status: status,
-            number: 0
+            status: 0,
+            number: status
           })
           this.data = res.data
         } catch (error) {

@@ -263,8 +263,10 @@
       async updateUserInfo(){
         this.modal2.loading = true
         try {
+          delete this.modal2.data['userTime']
           let res = await post(this.$url.updateUserById, this.modal2.data)
           if (res.status === 1) {
+
             this.$Message.success('操作成功')
             this.getData()
 
@@ -272,6 +274,7 @@
             this.$Message.error('操作失败')
           }
         } catch (error) {
+          debugger
           this.$throw(error)
         }
         this.modal2.loading = false

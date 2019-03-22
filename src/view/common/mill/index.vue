@@ -215,10 +215,10 @@
         </row>
         <row>
           <Col span="8">
-            <FormItem label="入库时间" prop="machineTime" :hidden="hiddenMachineTime">
+         <!--   <FormItem label="入库时间" prop="machineTime" :hidden="hiddenMachineTime">
               <DatePicker disabled :value="modal.data.machineTime" format="yyyy年MM月dd日 hh:mm:ss" type="date"
                           style="width: 200px"></DatePicker>
-            </FormItem>
+            </FormItem>-->
           </Col>
         </row>
 

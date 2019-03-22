@@ -14,7 +14,7 @@
               </Button>
 
 
-             
+
             </Col>
             <Col span="9">
               <Input v-model="search.value" placeholder="请输入您想要搜索的内容..." @click="find()" class="margin-bottom-10">
@@ -38,8 +38,8 @@
       <Form ref="modalForm" :model="modal" :label-width="80">
         <FormItem label="资讯状态" prop="currencyState">
           <RadioGroup v-model="modal.data.currencyState">
-            <Radio label="0">上线</Radio>
-            <Radio label="1">未上线</Radio>
+            <Radio label="1">上线</Radio>
+            <Radio label="2">未上线</Radio>
           </RadioGroup>
         </FormItem>
       </Form>
@@ -167,9 +167,9 @@
             width: 160,
             align: 'center',
             render: (h, params) => {
-              if (params.row.currencyState == 0) {
+              if (params.row.currencyState == 1) {
                 return h('Tag', { props: { color: 'success' } }, '上线')
-              } else {
+              } else if(params.row.currencyState == 2) {
                 return h('Tag', { props: { color: 'warning' } }, '未上线')
               }
 

@@ -148,12 +148,12 @@
             </FormItem>
           </Col>
           <Col span="12">
-            <FormItem label="入库时间" :hidden="hiddenMachineTime">
+           <!-- <FormItem label="入库时间" :hidden="hiddenMachineTime">
 
 
               <DatePicker disabled :value="modal.data.computerTime" format="yyyy年MM月dd日 hh:mm:ss" type="date"
                           style="width: 200px"></DatePicker>
-            </FormItem>
+            </FormItem>-->
           </Col>
         </row>
 

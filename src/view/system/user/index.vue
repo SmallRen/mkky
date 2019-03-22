@@ -183,7 +183,7 @@
               return h('tag',
                 {
                   props: {
-                    color: params.row.trusteeship == 1 ? 'warning' : 'success'
+                    color: params.row.trusteeship == 0 ? 'warning' : 'success'
                   }
                 }, params.row.trusteeship == 0 ? '未托管' : '已托管')
             },
